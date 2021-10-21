@@ -359,10 +359,13 @@ export default {
       allVisuals: [],
       defaultObj: [],
       animObj: [],
+      anim2Obj: [],
       visObj: [],
       activeObj: null,
       animSlider: { label: 'Time', color: 'primary', min: 10, max: 5 },
+      anim2Slider: { label: 'Time', color: 'primary', min: 10, max: 5 },
       animVal: 2,
+      anim2Val: 2,
       textPanel: ""
     }
   },
@@ -401,39 +404,48 @@ export default {
     },
     animVal(val) {
       console.log("Slider changed")
-      
+      /*
       if (this.activeObj && this.activeObj.constructor.name != "Array" && this.activeObj.userData.userAnimation != val) { // if changed manually, and needen object is not active yet
         console.log("adjust active obj")
         if (this.activeObj) this.hide(this.activeObj,0)
         let range = Array.from(new Array(this.animSlider.max-this.animSlider.min+1), (x, i) => i + this.animSlider.min)
         let ind = range.indexOf(val)
         
-        this.activeObj = this.animObj[ind]
+        if (condition) this.activeObj = this.animObj[ind]
+        else this.activeObj = this.anim2Obj[ind]
+
         if (this.activeObj) this.hide(this.activeObj,1)
 
       } else if (this.activeObj && this.activeObj.constructor.name == "Array"){
         console.log("Animation Array")
         this.activeObj.forEach(obj => this.hide(obj,0))
         this.activeObj =[]
-        this.animObj.forEach(obj => {
-          //console.log(obj.userData.userAnimation)
-          if ( (obj.userData.userAnimation && obj.userData.userAnimation == val) ) {
-            this.hide(obj,1)
-            this.activeObj.push(obj) 
-            this.hide(this.activeObj,1)
-          }else{
-            this.hide(obj,0)
-          }
-        })
-      }
-      /*
-      this.animObj.forEach(obj => {
-        if (obj.userData.userAnimation && obj.userData.userAnimation == val)  {
-          obj.visible = true 
-          this.activeObj = obj 
-          return
+        if (condition) {
+          this.animObj.forEach(obj => {
+            //console.log(obj.userData.userAnimation)
+            if ( (obj.userData.userAnimation && obj.userData.userAnimation == val) ) {
+              this.hide(obj,1)
+              this.activeObj.push(obj) 
+              this.hide(this.activeObj,1)
+            }else{
+              this.hide(obj,0)
+            }
+          })
+        } else {
+          this.anim2Obj.forEach(obj => {
+            //console.log(obj.userData.userAnimation)
+            if ( (obj.userData.userAnimation && obj.userData.userAnimation == val) ) {
+              this.hide(obj,1)
+              this.activeObj.push(obj) 
+              this.hide(this.activeObj,1)
+            }else{
+              this.hide(obj,0)
+            }
+          })
         }
-      }) */
+      }
+      */
+      
     },
     loadProgress(newVal) {
       if (newVal >= 99) {
@@ -482,15 +494,25 @@ export default {
 
             if (item.userData.userVisuals.includes('Animation')) {
               //console.log(item.userData.userAnimation)
-              if (item.userData.userAnimation < this.animSlider.min) this.animSlider.min = item.userData.userAnimation
-              if (item.userData.userAnimation > this.animSlider.max) this.animSlider.max = item.userData.userAnimation
-              this.animObj.push(item)
+              if (!item.userData.userVisuals.includes('Steps')) {
+                this.animObj.push(item)
+                if (item.userData.userAnimation < this.animSlider.min) this.animSlider.min = item.userData.userAnimation
+                if (item.userData.userAnimation > this.animSlider.max) this.animSlider.max = item.userData.userAnimation
+              }
+              else {
+                this.anim2Obj.push(item)
+                if (item.userData.userAnimation < this.anim2Slider.min) this.anim2Slider.min = item.userData.userAnimation
+                if (item.userData.userAnimation > this.anim2Slider.max) this.anim2Slider.max = item.userData.userAnimation
+              }
+
             }else this.visObj.push(item)
           } else { this.defaultObj.push(item), this.hide(item,1), console.log("VISIBLE"), console.log(item) }
         })
         //console.log(this.animObj)
         this.animVal = this.animSlider.min 
+        this.anim2Val = this.anim2Slider.min 
         this.animObj.sort((a, b) => a.userData.userAnimation < b.userData.userAnimation ? - 1 : Number(a.userData.userAnimation > b.userData.userAnimation))
+        this.anim2Obj.sort((a, b) => a.userData.userAnimation < b.userData.userAnimation ? - 1 : Number(a.userData.userAnimation > b.userData.userAnimation))
         //console.log(this.animObj)
         this.allVisuals = Array.from(set)
         console.log("All Visuals:")
@@ -502,6 +524,8 @@ export default {
         console.log(this.visObj)
         console.log("AnimObj: ")
         console.log(this.animObj)
+        console.log("Anim2Obj: ")
+        console.log(this.anim2Obj)
         console.log(this.animSlider.min)
         console.log(this.animSlider.max)
       }
@@ -618,29 +642,27 @@ export default {
       
       if (filterGroup && filterGroup.length>0) console.log(filterGroup), this.textPanel = "   " + filterGroup[filterGroup.length-1].toString() + "   " //.split("[")[1].split("]")[0] 
 
-      if (filterGroup.includes('Animation') && this.activeObj.constructor.name != "Array") {
+      if (filterGroup.includes('Animation') && this.activeObj.constructor.name != "Array") { //switching from normal view to animated
         this.showAnimationPanel = true
         this.animVal = this.animSlider.min 
-        this.activeObj = this.animObj[0]
+        this.anim2Val = this.anim2Slider.min 
+        let group = ""
+        if (!filterGroup.includes('Steps')) this.activeObj = this.animObj[0], group = 1
+        else this.activeObj = this.anim2Obj[0], group = 2
         this.hide(this.activeObj,1)
-
-        //let range = Array.from(new Array(this.animSlider.max-this.animSlider.min+1), (x, i) => i + this.animSlider.min)
-        //range.forEach(i =>  { 
-        //  console.log(i)
-        //  setTimeout(this.doSetTimeout.bind(i), 1000)
-        //})
-        //console.log(range)
-        this.animate() 
+        this.animate(group) 
 
       }else {
-        // hide all animated objects
+        // hide all animated objects 
         this.showAnimationPanel = false
         this.animVal = this.animSlider.min 
-        if (this.activeObj && this.activeObj.constructor.name == "Array"){
+        this.anim2Val = this.anim2Slider.min 
+        if (this.activeObj && this.activeObj.constructor.name == "Array"){ //switching from animated view to normal
           console.log("Animation Array")
           this.activeObj.forEach(obj => this.hide(obj,0))
           this.activeObj =[]
           this.animObj.forEach(obj => this.hide(obj,0)  )
+          this.anim2Obj.forEach(obj => this.hide(obj,0)  )
         }
       } 
       console.log(filterGroup)
@@ -663,32 +685,52 @@ export default {
         })
       
     },
-    animate(){ 
+    animate(a){ 
       let range = Array.from(new Array(this.animSlider.max-this.animSlider.min), (x, i) => i + this.animSlider.min)
+      let range2 = Array.from(new Array(this.anim2Slider.max-this.anim2Slider.min), (x, i) => i + this.anim2Slider.min)
+      let ranges = []
+      if (a==1) ranges = range
+      else ranges = range2
       console.log(range)
       console.log(this.animSlider.min)
       console.log(this.animSlider.max)
-      for (let i in range) {
+      for (let i in ranges) {
         setTimeout(() => {
           console.log("TIMEOUT running")
           //console.log(i+this.animSlider.min)
           if (this.activeObj) this.hide(this.activeObj,0)
           this.activeObj =[]
-          this.animObj.forEach(obj => {
-            console.log(obj.userData.userAnimation)
-            if ( (obj.userData.userAnimation && obj.userData.userAnimation <= i+this.animSlider.min) ) {
-              this.hide(obj,1)
-              console.log(obj)
-              this.activeObj.push(obj) 
-              console.log(this.activeObj)
-              this.hide(this.activeObj,1)
-            }else{
-              this.hide(obj,0)
-            }
-          })
+          if (a==1) {
+            this.animObj.forEach(obj => {
+              console.log(obj.userData.userAnimation)
+              if ( (obj.userData.userAnimation && obj.userData.userAnimation <= i+this.animSlider.min) ) {
+                this.hide(obj,1)
+                console.log(obj)
+                this.activeObj.push(obj) 
+                console.log(this.activeObj)
+                this.hide(this.activeObj,1)
+              }else{
+                this.hide(obj,0)
+              }
+            })
+          }else {
+            this.anim2Obj.forEach(obj => {
+              console.log(obj.userData.userAnimation)
+              if ( (obj.userData.userAnimation && obj.userData.userAnimation <= i+this.anim2Slider.min) ) {
+                this.hide(obj,1)
+                console.log(obj)
+                this.activeObj.push(obj) 
+                console.log(this.activeObj)
+                this.hide(this.activeObj,1)
+              }else{
+                this.hide(obj,0)
+              }
+            })
+          }
           //this.animVal = i+this.animSlider.min
           console.log("slider reset to: ")
           console.log(this.animVal)
+          console.log(this.anim2Val)
           console.log(this.activeObj)
         }, 
         i++ * 200);
