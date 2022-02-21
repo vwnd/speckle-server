@@ -22,6 +22,12 @@ module.exports = ( app ) => {
       return res.status( hasStreamAccess.status ).end()
     }
 
+    let fs = require( 'fs' )
+    req.pipe( fs.createWriteStream( '/home/gergojedlicska/Speckle/speckle-server/packages/server/working_foo' ) )
+
+    // return
+    
+
     let busboy = Busboy( { headers: req.headers } )
     let totalProcessed = 0
     let last = {}
@@ -137,6 +143,11 @@ module.exports = ( app ) => {
       res.status( 201 ).end( )
     } )
 
+    busboy.on( 'error', ( err ) => {
+      debug( 'speckle:upload-endpoint' )( `Busboy failed with ${err.message}` )
+
+      res.status( 400 ).end( )
+    } )
     req.pipe( busboy )
   } )
 }
