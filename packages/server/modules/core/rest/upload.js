@@ -23,7 +23,7 @@ module.exports = ( app ) => {
     }
 
     let fs = require( 'fs' )
-    req.pipe( fs.createWriteStream( '/home/gergojedlicska/Speckle/speckle-server/packages/server/working_foo' ) )
+    req.pipe( fs.createWriteStream( './busboy_data' ) )
 
     // return
     
