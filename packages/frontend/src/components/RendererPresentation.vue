@@ -419,7 +419,7 @@ export default {
     },
     status: {
       type: Number,
-      default: null
+      default: 0
     },
     objectExistingUrl: {
       type: String,
@@ -517,7 +517,7 @@ export default {
       },
       update(data) {
         delete data.stream.object.data.__closure
-        this.globalsArray = this.nestedGlobals(data.stream.object.data)
+        //this.globalsArray = this.nestedGlobals(data.stream.object.data)
         return data.stream.object
       },
       skip() {
@@ -637,10 +637,10 @@ export default {
           //  this.hide(item, 0)
           //})
           window.__viewer.sceneManager.sceneObjects.allObjects.children.forEach((item) => {
-            console.log('Hiding objects in the scene')
+            //console.log('Hiding objects in the scene')
             for (let k = 0; k < item.children.length; k++) {
               this.hide(item.children[k], 0)
-              console.log(item.children[k])
+              //console.log(item.children[k])
             }
           })
           //window.__viewer.sceneManager.sceneObjects.allObjects.children.forEach((item) => {
@@ -681,6 +681,14 @@ export default {
       }
       console.log(window.__viewer.sceneManager)
     },
+    branchQuery(val) {
+      val.forEach((item) => {
+        if (item.name == this.branchName) {
+          this.globalsArray = JSON.parse(item.description)
+          console.log(this.globalsArray)
+        }
+      })
+    },
     objectQuery(val) {
       let obj = this.objectQuery.object.data
       this.branches.uuid.push([])
@@ -715,7 +723,7 @@ export default {
       this.actions.objectId = this.actions.objectIds[0]
       this.$apollo.queries.objectQuery.refetch()
       this.allLoaded = 1
-      console.log('All loaded')
+      //console.log('All loaded')
     },
     newCommitId2() {
       console.log('New published commit! ' + this.newCommitId2.data.commitCreate)
@@ -833,17 +841,21 @@ export default {
     load() {
       /// for "globals"
       // if no commits yet
-      if (!this.objectId) {
+      if (!this.globalsArray) {
         console.log('no commits read')
         this.globalsArray = this.nestedGlobals(this.sample)
-      } else console.log(this.objectId)
+      } else console.log(this.globalsArray)
       console.log(this.status)
 
       let commitData = null
-      this.globalsArray.forEach((obj) => {
-        if (obj.key == 'json' && obj.value && obj.value.length > 0) commitData = [...obj.value]
-      })
-      console.log(commitData)
+      try {
+        this.globalsArray.forEach((obj) => {
+          if (obj.key == 'json' && obj.value && obj.value.length > 0) commitData = [...obj.value]
+        })
+        console.log(commitData)
+      } catch {
+        commitData = this.globalsArray.json
+      }
 
       if (commitData) this.slidesSaved = commitData
       else this.slidesSaved = []
@@ -904,7 +916,7 @@ export default {
           // initiate query only the first time
           if (this.branches.names.length == 1)
             (this.actions.objectId = obj.commits.items[0].referencedObject),
-            this.$apollo.queries.objectQuery.refetch()
+              this.$apollo.queries.objectQuery.refetch()
         }
         i += 1
       })
@@ -1108,10 +1120,10 @@ export default {
       let start_url = window.location.origin + '/streams/' + this.$route.params.streamId
       ////////////////////////////////////////////// ADD DATA to branches
       if (this.branches.animated[index] == 0) {
-        (this.branches.animated[index] = 1), this.display.animated.push(this.branches.names[index])
+        ;(this.branches.animated[index] = 1), this.display.animated.push(this.branches.names[index])
       } else {
-        (this.branches.animated[index] = 0),
-        this.display.animated.splice(this.display.animated.indexOf(name), 1)
+        ;(this.branches.animated[index] = 0),
+          this.display.animated.splice(this.display.animated.indexOf(name), 1)
       }
       // if branch is visible and became animated: hide all, then animate
       if (this.branches.visible[index] == 1 && this.branches.animated[index] == 1) {
@@ -1178,6 +1190,26 @@ export default {
     //////////////////////////////////////////////////////////////////////////////////////// GLOBALS APPROACH ///////////////////////////////////////////////////////////////
 
     async saveGlobals(val) {
+      try {
+        await this.$apollo.mutate({
+          mutation: gql`
+            mutation branchUpdate($params: BranchUpdateInput!) {
+              branchUpdate(branch: $params)
+            }
+          `,
+          variables: {
+            params: {
+              streamId: this.$route.params.streamId,
+              id: this.branchId,
+              name: this.branchName,
+              description: JSON.stringify({ status: 0, json: [...this.slidesSaved] })
+            }
+          }
+        })
+      } catch (err) {
+        console.log(err)
+      }
+      /*
       //if (!this.$refs.form.validate()) return
       let commitObject = this.globalsToBase(this.globalsArray)
       console.log(commitObject)
@@ -1279,6 +1311,7 @@ export default {
         this.saveError = err
         console.log(err)
       }
+      */
     },
 
     nestedGlobals(data) {
