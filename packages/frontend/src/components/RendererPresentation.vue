@@ -639,16 +639,10 @@ export default {
           window.__viewer.sceneManager.sceneObjects.allObjects.children.forEach((item) => {
             //console.log('Hiding objects in the scene')
             for (let k = 0; k < item.children.length; k++) {
-              this.hide(item.children[k], 0)
+              this.hide(item.children[k], 0) // this option works for most objects
               //console.log(item.children[k])
             }
           })
-          //window.__viewer.sceneManager.sceneObjects.allObjects.children.forEach((item) => {
-          //  for (let k = 0; k < item.children.length; k++) {
-          //    console.log(item.children[k])
-          //    this.hide(item.children[k], 0)
-          //  }
-          //})
         }, 1000)
       }
     },
@@ -671,12 +665,6 @@ export default {
               this.hide(item.children[k], 0)
             }
           })
-          //window.__viewer.sceneManager.sceneObjects.allObjects.children.forEach((item) => {
-          //  for (let k = 0; k < item.children.length; k++) {
-          //    console.log(item.children[k])
-          //    this.hide(item.children[k], 0)
-          //  }
-          //})
         }, 1000)
       }
       console.log(window.__viewer.sceneManager)
@@ -692,6 +680,7 @@ export default {
     objectQuery(val) {
       let obj = this.objectQuery.object.data
       this.branches.uuid.push([])
+      console.log(obj)
 
       if (obj['@data']) {
         obj['@data'].forEach((sub_obj) => {
@@ -962,13 +951,19 @@ export default {
       }
 
       /////// if branch is animated, animate only if not already on
+      console.log(this.branches.uuid)
+      console.log(name)
+      console.log(index)
+
       if (this.branches.visible[index] == 1 && this.branches.animated[index] == 1) {
         if (!this.actions.alreadyAnimated.includes(this.branches.names[index]))
           this.animate(this.branches.uuid[index], this.branches.names[index])
       } else if (this.branches.uuid[index] && this.branches.uuid[index][0]) {
         this.branches.uuid[index].forEach((obj) => {
+          console.log(obj)
           window.__viewer.sceneManager.sceneObjects.allObjects.children.forEach((item) => {
             for (let k = 0; k < item.children.length; k++) {
+              console.log(item.children[k].uuid)
               if (item.children[k] && item.children[k].uuid == obj) {
                 this.hide(item.children[k], this.branches.visible[index]) //set new visibility
                 console.log(item.children[k].uuid)

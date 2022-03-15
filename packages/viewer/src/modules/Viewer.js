@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import * as Geo from 'geo-three'
 
 import Stats from 'three/examples/jsm/libs/stats.module.js'
 
@@ -62,6 +63,54 @@ export default class Viewer extends EventEmitter {
     this.onWindowResize()
     this.interactions.zoomExtents()
     this.needsRender = true
+
+    /////////////////////////////////////////////        
+    this.DEV_MAPBOX_API_KEY = 'pk.eyJ1Ijoia2F0LXNwZWNrbGUiLCJhIjoiY2t5cm1oZDZmMHZkbTJxbzVhdnkxeGYzaCJ9.JXufxeNiDCDDi5JgzUrsbQ'
+    this.north = 0
+    this.selectedMapIndex = 1
+
+    // adding map tiles
+    this.map_providers = [
+      [ 'No map' ],
+      [ 'Mapbox Light', new Geo.MapBoxProvider( this.DEV_MAPBOX_API_KEY, 'kat-speckle/ckz59opgu003y15p4hi2fib4d', Geo.MapBoxProvider.STYLE ), 0xa6a6a6 ], //works (custom token)
+      [ 'Mapbox Dark', new Geo.MapBoxProvider( this.DEV_MAPBOX_API_KEY, 'kat-speckle/ckz59co9z002414nkyty48va3', Geo.MapBoxProvider.STYLE ), 0x2b2b2b ] //works (custom token)
+      ]
+    
+    this.map_modes = [
+      [ 'Planar', Geo.MapView.PLANAR ],
+      [ 'Height', Geo.MapView.HEIGHT ],
+      // ["Martini", Geo.MapView.MARTINI],
+      [ 'Height Shader', Geo.MapView.HEIGHT_SHADER ],
+      [ 'Spherical', Geo.MapView.SPHERICAL ]
+    ]
+    //this.addMap()
+
+  }
+
+  async addMap() {
+    //this.addBuildings()
+    // example building https://latest.speckle.dev/streams/8b29ca2b2e/objects/288f67a0a45b2a4c3bd01f7eb3032495
+
+    let selectedMap = 1
+    let coords = { x: 0, y: 0, z: 0 }
+    let scale = 1
+
+    //this.removeMap()
+    if ( selectedMap > 0 ) {
+      //create and add map to scene
+      let map = new Geo.MapView( this.map_modes[0][1], this.map_providers[selectedMap][1], this.map_providers[selectedMap][1] )
+      map.name = 'Base map'
+      this.scene.add( map )
+      map.rotation.x += Math.PI / 2
+      //set selected map provider
+      map.setProvider( this.map_providers[selectedMap][1] )
+          
+      map.scale.set( map.scale.x / scale, map.scale.y / scale, map.scale.z / scale )
+      let movingVector = new THREE.Vector3( coords.x / scale, coords.y / scale, 0 ) //get vector to correct location on the map
+      map.position.x -= movingVector.x
+      map.position.y -= movingVector.y
+      this.interactions.rotateCamera( 0.001 ) //to activate map loading
+    }
   }
 
   sceneLights() {
@@ -241,10 +290,10 @@ export default class Viewer extends EventEmitter {
     return this.sceneManager.sceneObjects.getObjectsProperties()
   }
   createCube() {
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial( { color: 0x047EFB } );
-    const cube = new THREE.Mesh( geometry, material );
-    this.scene.add( cube );
+    const geometry = new THREE.BoxGeometry()
+    const material = new THREE.MeshBasicMaterial( { color: 0x047EFB } )
+    const cube = new THREE.Mesh( geometry, material )
+    this.scene.add( cube )
   }
 
   dispose() {
