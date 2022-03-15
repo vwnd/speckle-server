@@ -264,9 +264,11 @@ export default class SceneObjectManager {
   }
 
   removeAllObjects() {
-    for ( let obj of this.objects ) {
-      if ( obj.geometry ) {
-        obj.geometry.dispose()
+    for ( let obj of this.sceneObjects.allObjects.children ) {
+      for ( let k = 0; k < obj.children.length; k++ ) {
+        if ( obj.children[k] && obj.children[k].geometry ) {
+          obj.children[k].geometry.dispose()
+        }
       }
     }
     this.sceneObjects.allSolidObjects.clear()
@@ -275,7 +277,7 @@ export default class SceneObjectManager {
     this.sceneObjects.allPointObjects.clear()
 
     this.viewer.interactions.deselectObjects()
-    this.viewer.interactions.hideSectionBox()
+    //this.viewer.interactions.hideSectionBox()
     //this.objectIds = []
     this.views = []
 
@@ -291,7 +293,7 @@ export default class SceneObjectManager {
   }
 
   getSceneBoundingBox() {
-    if ( this.objects.length === 0 )  {
+    if ( this.sceneObjects.allObjects.children.length === 0 )  {
       let box = new THREE.Box3( new THREE.Vector3( -1,-1,-1 ), new THREE.Vector3( 1,1,1 ) )
       return box
     }
