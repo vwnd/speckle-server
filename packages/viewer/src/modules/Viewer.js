@@ -87,11 +87,11 @@ export default class Viewer extends EventEmitter {
 
   }
 
-  async addMap() {
+  addMap() {
     //this.addBuildings()
     // example building https://latest.speckle.dev/streams/8b29ca2b2e/objects/288f67a0a45b2a4c3bd01f7eb3032495
 
-    let selectedMap = 1
+    let selectedMap = 2
     let coords = { x: 0, y: 0, z: 0 }
     let scale = 1
 

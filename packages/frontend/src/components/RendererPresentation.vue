@@ -639,11 +639,19 @@ export default {
           window.__viewer.sceneManager.sceneObjects.allObjects.children.forEach((item) => {
             //console.log('Hiding objects in the scene')
             for (let k = 0; k < item.children.length; k++) {
-              this.hide(item.children[k], 0) // this option works for most objects
-              //console.log(item.children[k])
+              if (
+                (item.children[k].name && item.children[k].name != 'Base map') ||
+                !item.children[k].name
+              ) {
+                console.log('HIDE')
+                this.hide(item.children[k], 0) // this option works for most objects
+                //console.log(item.children[k])
+              }
             }
           })
+          window.__viewer.sceneManager.viewer.addMap()
         }, 1000)
+        //
       }
     },
     allLoaded(newVal) {
@@ -661,8 +669,13 @@ export default {
           //})
           window.__viewer.sceneManager.sceneObjects.allObjects.children.forEach((item) => {
             for (let k = 0; k < item.children.length; k++) {
-              console.log(item.children[k])
-              this.hide(item.children[k], 0)
+              //console.log(item.children[k])
+              if (
+                (item.children[k].name && item.children[k].name != 'Base map') ||
+                !item.children[k].name
+              ) {
+                this.hide(item.children[k], 0)
+              }
             }
           })
         }, 1000)
@@ -830,6 +843,7 @@ export default {
     load() {
       /// for "globals"
       // if no commits yet
+
       if (!this.globalsArray) {
         console.log('no commits read')
         this.globalsArray = this.nestedGlobals(this.sample)
@@ -963,7 +977,7 @@ export default {
           console.log(obj)
           window.__viewer.sceneManager.sceneObjects.allObjects.children.forEach((item) => {
             for (let k = 0; k < item.children.length; k++) {
-              console.log(item.children[k].uuid)
+              //console.log(item.children[k].uuid)
               if (item.children[k] && item.children[k].uuid == obj) {
                 this.hide(item.children[k], this.branches.visible[index]) //set new visibility
                 console.log(item.children[k].uuid)
@@ -979,16 +993,18 @@ export default {
     hide(obj, i) {
       //console.log(obj)
       if (i == 0) {
-        obj.visible = false
+        if ((obj.name && obj.name != 'Base map') || !obj.name) {
+          obj.visible = false
+        }
         //obj.parent.visible = false
-        //console.log('hide')
-        if (obj.scale) (obj.scale.x = 0), (obj.scale.y = 0), (obj.scale.z = 0)
+        //if (obj.scale) (obj.scale.x = 0), (obj.scale.y = 0), (obj.scale.z = 0)
       }
       if (i == 1) {
-        obj.visible = true
-        obj.parent.visible = true
-        //console.log('show')
-        if (obj.scale) (obj.scale.x = 1), (obj.scale.y = 1), (obj.scale.z = 1)
+        if ((obj.name && obj.name != 'Base map') || !obj.name) {
+          obj.visible = true
+          obj.parent.visible = true
+        }
+        //if (obj.scale) (obj.scale.x = 1), (obj.scale.y = 1), (obj.scale.z = 1)
       }
       window.__viewer.needsRender = true
     },
