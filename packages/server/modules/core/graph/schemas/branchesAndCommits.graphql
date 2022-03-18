@@ -1,7 +1,7 @@
 extend type Stream {
   commits(limit: Int! = 25, cursor: String): CommitCollection
   commit(id: String): Commit
-  branches(limit: Int! = 25, cursor: String): BranchCollection
+  branches(limit: Int! = 50, cursor: String): BranchCollection
   branch(name: String = "main"): Branch
 }
 
