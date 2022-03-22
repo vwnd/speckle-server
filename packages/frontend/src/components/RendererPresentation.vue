@@ -235,7 +235,6 @@
                 <v-icon small>mdi-arrow-right-bold</v-icon>
               </v-btn>
             </template>
-            Next slide
           </v-tooltip>
 
           <v-dialog
@@ -919,7 +918,7 @@ export default {
           // initiate query only the first time
           if (this.branches.names.length == 1)
             (this.actions.objectId = obj.commits.items[0].referencedObject),
-              this.$apollo.queries.objectQuery.refetch()
+            this.$apollo.queries.objectQuery.refetch()
         }
         i += 1
       })
@@ -1131,10 +1130,10 @@ export default {
       let start_url = window.location.origin + '/streams/' + this.$route.params.streamId
       ////////////////////////////////////////////// ADD DATA to branches
       if (this.branches.animated[index] == 0) {
-        ;(this.branches.animated[index] = 1), this.display.animated.push(this.branches.names[index])
+        (this.branches.animated[index] = 1), this.display.animated.push(this.branches.names[index])
       } else {
-        ;(this.branches.animated[index] = 0),
-          this.display.animated.splice(this.display.animated.indexOf(name), 1)
+        (this.branches.animated[index] = 0),
+        this.display.animated.splice(this.display.animated.indexOf(name), 1)
       }
       // if branch is visible and became animated: hide all, then animate
       if (this.branches.visible[index] == 1 && this.branches.animated[index] == 1) {
