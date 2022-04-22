@@ -1,3 +1,4 @@
+/* eslint-disable */
 import * as THREE from 'three'
 
 import Stats from 'three/examples/jsm/libs/stats.module.js'
@@ -9,6 +10,15 @@ import InteractionHandler from './InteractionHandler'
 import CameraHandler from './context/CameraHanlder'
 
 import SectionBox from './SectionBox'
+import {
+  Box3
+} from 'three'
+import {
+  Vector3
+} from 'three'
+import {
+  Matrix4
+} from 'three'
 
 export default class Viewer extends EventEmitter {
   constructor({
@@ -47,7 +57,7 @@ export default class Viewer extends EventEmitter {
       generateMipmaps: true,
       minFilter: THREE.LinearMipmapLinearFilter
     })
-    this.cubeCamera = new THREE.CubeCamera(0.1, 10_000, cubeRenderTarget)
+    this.cubeCamera = new THREE.CubeCamera(0.1, 10000, cubeRenderTarget)
     this.scene.add(this.cubeCamera)
 
     if (showStats) {
@@ -148,6 +158,109 @@ export default class Viewer extends EventEmitter {
     this.needsRender = true
   }
 
+  postLoad() {
+    // const worldBox = new Box3().setFromObject(this.sceneManager.sceneObjects.allObjects);
+    // const floatingOrigin = worldBox.getCenter(new Vector3());
+    // const cube = this.sceneManager.sceneObjects.groupedSolidObjects.children[0];
+    // cube.position.set(-floatingOrigin.x, -floatingOrigin.y, -floatingOrigin.z);
+    // cube.matrixAutoUpdate = false;
+    // cube.matrixWorld = new Matrix4().makeTranslation(-floatingOrigin.x, -floatingOrigin.y, -floatingOrigin.z);
+    // this.cameraHandler.controls.setTarget(0, 0, 0);
+    // const material = new THREE.ShaderMaterial({
+    //   uniforms: {
+    //     model: {
+    //       value: null
+    //     },
+    //     view: {
+    //       value: null
+    //     },
+    //     mv: {
+    //       value: null
+    //     },
+    //     eyePos: {
+    //       value: null
+    //     }
+    //   },
+
+    //   vertexShader: `
+    //     uniform mat4 model;
+    //     uniform mat4 view;
+    //     uniform mat4 mv;
+    //     uniform vec3 eyePos;
+    //     void main() {
+    //       vec4 _model = model * vec4(position, 1.0);
+    //       gl_Position = projectionMatrix * view * _model;
+    //       // gl_Position = projectionMatrix * mv * vec4(position, 1.0);
+    //       // vec4 rte = vec4(position - eyePos, 1.0);
+    //       // gl_Position = projectionMatrix * view * model * rte;
+    //     }
+    //   `,
+    //   fragmentShader: `
+    //     void main() {
+    //       gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+    //     }
+    //   `
+    // });
+    // const cube = this.sceneManager.sceneObjects.groupedSolidObjects.children[0];
+    // cube.updateMatrixWorld(true);
+    // const cubeWorld = new Matrix4().copy(cube.matrixWorld);
+    // const center = new Box3().setFromObject(cube).getCenter(new Vector3());
+    // // cube.translateX(-center.x);
+    // // cube.translateY(-center.y);
+    // // cube.translateZ(-center.z);
+    // // cube.updateMatrixWorld(true);
+    // // material.uniforms.model.value = cube.matrixWorld;
+    // // this.interactions.zoomToObject(cube, 1, false);
+    // this.interactions.zoomToObject(cube, 1, false);
+
+    // cube.onBeforeRender = (renderer, scene, camera, geometry, material) => {
+
+    //   /**
+    //    * RTE
+    //    */
+    //   // const newWorld = new Matrix4().copy(cubeWorld);
+    //   // const newCamera = new Matrix4().copy(camera.matrixWorld);
+    //   // newCamera.setPosition(0, 0, 0);
+    //   // const newView = new Matrix4().copy(newCamera);
+    //   // newView.invert();
+    //   // material.uniforms.model.value = newWorld;
+    //   // material.uniforms.view.value = newView;
+    //   // material.uniforms.eyePos.value = new Vector3().copy(camera.position);
+
+    //   /**
+    //    * MOVE TO ORIGIN
+    //    */
+    //   const newWorld = new Matrix4().copy(cubeWorld);
+    //   const newCamera = new Matrix4().copy(camera.matrixWorld);
+    //   newWorld.setPosition(-center.x, -center.y, -center.z);
+    //   newCamera.setPosition(camera.position.x - center.x, camera.position.y - center.y, camera.position.z - center.z);
+    //   const newView = new Matrix4().copy(newCamera);
+    //   newView.invert();
+    //   material.uniforms.model.value = newWorld;
+    //   material.uniforms.view.value = newView;
+    //   // material.uniforms.mv.value = newView.multiply(newWorld);
+
+
+    //   /**
+    //    * RTC
+    //    */
+    //   // const mv = new Matrix4().multiplyMatrices(camera.matrixWorldInverse, cube.matrixWorld);
+    //   // let origin = new THREE.Vector4(center.x, center.y, center.z, 1.0);
+    //   // //multiply mv by center
+    //   // origin.applyMatrix4(mv);
+    //   // let newMV = new THREE.Matrix4().set(mv.elements[0], mv.elements[4], mv.elements[8], origin.x,
+    //   //   mv.elements[1], mv.elements[5], mv.elements[9], origin.y,
+    //   //   mv.elements[2], mv.elements[6], mv.elements[10], origin.z,
+    //   //   mv.elements[3], mv.elements[7], mv.elements[11], mv.elements[15]);
+
+    //   // material.uniforms.mv.value = newMV;
+
+    // }
+
+    // cube.material = material;
+
+  }
+
   animate() {
     const delta = this.clock.getDelta()
 
@@ -163,7 +276,7 @@ export default class Viewer extends EventEmitter {
       this.render()
       if (this.stats && document.getElementById('info-draws'))
         document.getElementById('info-draws').textContent =
-          '' + this.renderer.info.render.calls
+        '' + this.renderer.info.render.calls
       if (this.stats) this.stats.end()
     }
   }
@@ -190,6 +303,19 @@ export default class Viewer extends EventEmitter {
       this.reflectionsNeedUpdate = false
     }
 
+    // const vecBuff0 = new Vector3();
+    // const vecBuff1 = new Vector3();
+    // const matBuff = new Matrix4();
+    // this.scene.traverseVisible((obj) => {
+    //   if (obj.isMesh) {
+    //     if (!obj.geometry.boundingBox) {
+    //       obj.geometry.computeBoundingBox();
+    //     }
+    //     obj.geometry.boundingBox.getCenter(vecBuff0);
+    //     matBuff.setPosition(vecBuff0);
+    //     obj.material.userData.rtcMatrix.value.copy(new Matrix4());
+    //   }
+    // })
     this.renderer.render(this.scene, this.cameraHandler.activeCam.camera)
   }
 
@@ -224,6 +350,7 @@ export default class Viewer extends EventEmitter {
       const loader = new ViewerObjectLoader(this, url, token, enableCaching)
       this.loaders[url] = loader
       await loader.load()
+      this.postLoad();
     } finally {
       if (--this.inProgressOperations === 0) this.emit('busy', false)
     }

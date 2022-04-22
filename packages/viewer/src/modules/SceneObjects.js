@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
+import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils"
 import FilteringManager from './FilteringManager'
 
 /**
@@ -34,6 +34,10 @@ export default class SceneObjects {
     this.groupedSolidObjects = new THREE.Group()
     this.groupedSolidObjects.name = 'groupedSolidObjects'
     this.allObjects.add(this.groupedSolidObjects)
+
+    this.floatingOrigin = new THREE.Group();
+    this.floatingOrigin.name = "floatingOrigin";
+    this.floatingOrigin.add(this.allObjects);
 
     this.filteringManager = new FilteringManager(this.viewer)
     this.filteredObjects = null
@@ -242,7 +246,9 @@ export default class SceneObjects {
     this.appliedFilter = filter
     this.viewer.needsRender = true
 
-    return { colorLegend: this.filteringManager.colorLegend }
+    return {
+      colorLegend: this.filteringManager.colorLegend
+    }
   }
 
   flattenGroup(group) {

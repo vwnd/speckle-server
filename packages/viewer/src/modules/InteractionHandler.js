@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import SpeckleLambertMaterial from './materials/SpeckleLambertMaterial'
 import SelectionHelper from './SelectionHelper'
 
 export default class InteractionHandler {
@@ -10,7 +11,7 @@ export default class InteractionHandler {
       sectionBox: this.sectionBox,
       hover: false
     })
-    this.selectionMeshMaterial = new THREE.MeshLambertMaterial({
+    this.selectionMeshMaterial = new SpeckleLambertMaterial({
       color: 0x0b55d2,
       side: THREE.DoubleSide,
       wireframe: false,
@@ -34,7 +35,7 @@ export default class InteractionHandler {
     this.selectionBox = new THREE.Group()
     this.viewer.scene.add(this.selectionBox)
 
-    this.overlayMeshMaterial = new THREE.MeshLambertMaterial({
+    this.overlayMeshMaterial = new SpeckleLambertMaterial({
       color: 0x57f7ff,
       side: THREE.DoubleSide,
       wireframe: false,

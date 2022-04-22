@@ -1,6 +1,11 @@
 import * as THREE from 'three'
 import debounce from 'lodash.debounce'
 import SceneObjects from './SceneObjects'
+import SpeckleStandardMaterial from './materials/SpeckleStandardMaterial'
+import {
+  Matrix4
+} from 'three'
+import SpeckleBasicMaterial from './materials/SpeckleBasicMaterial'
 
 /**
  * Manages objects and provides some convenience methods to focus on the entire scene, or one specific object.
@@ -13,7 +18,7 @@ export default class SceneObjectManager {
 
     this.sceneObjects = new SceneObjects(viewer)
 
-    this.solidMaterial = new THREE.MeshStandardMaterial({
+    this.solidMaterial = new SpeckleStandardMaterial({
       color: 0x8d9194,
       emissive: 0x0,
       roughness: 1,
@@ -23,7 +28,7 @@ export default class SceneObjectManager {
       clippingPlanes: this.viewer.sectionBox.planes
     })
 
-    this.transparentMaterial = new THREE.MeshStandardMaterial({
+    this.transparentMaterial = new SpeckleStandardMaterial({
       color: 0xa0a4a8,
       emissive: 0x0,
       roughness: 0,
@@ -35,7 +40,7 @@ export default class SceneObjectManager {
       clippingPlanes: this.viewer.sectionBox.planes
     })
 
-    this.solidVertexMaterial = new THREE.MeshBasicMaterial({
+    this.solidVertexMaterial = new SpeckleBasicMaterial({
       color: 0xffffff,
       vertexColors: THREE.VertexColors,
       side: THREE.DoubleSide,
@@ -66,8 +71,9 @@ export default class SceneObjectManager {
       () => {
         this.postLoadFunction()
       },
-      20,
-      { maxWait: 5000 }
+      20, {
+        maxWait: 5000
+      }
     )
     this.skipPostLoad = skipPostLoad
     this.loaders = []
@@ -208,14 +214,13 @@ export default class SceneObjectManager {
      * Display style doesn't seem to have anything regarding to opacity, so I assume lines/curves are always opaque?
      */
     let material = this.lineMaterial;
-    if(wrapper.meta.displayStyle) {
+    if (wrapper.meta.displayStyle) {
       material = this.lineMaterial.clone();
       material.color = new THREE.Color(this._argbToRGB(wrapper.meta.displayStyle.color));
       material.color.convertSRGBToLinear();
-      
+
       material.clippingPlanes = this.viewer.sectionBox.planes;
-    }
-    else if (wrapper.meta.renderMaterial) {
+    } else if (wrapper.meta.renderMaterial) {
       material = this.lineMaterial.clone();
       material.color = new THREE.Color(this._argbToRGB(wrapper.meta.renderMaterial.diffuse));
       material.color.convertSRGBToLinear();
@@ -302,8 +307,7 @@ export default class SceneObjectManager {
 
     for (const objGroup of this.sceneObjects.allObjects.children) {
       const toRemove = objGroup.children.filter(
-        (obj) => obj.userData?.__importedUrl === importedUrl
-      )
+        (obj) => obj.userData?.__importedUrl === importedUrl)
       toRemove.forEach((obj) => {
         if (obj.material) obj.material.dispose()
         if (obj.geometry) obj.geometry.dispose()
@@ -364,13 +368,13 @@ export default class SceneObjectManager {
   }
 
   _srgbToLinear(x) {
-		if (x <= 0)
-			return 0;
-		else if (x >= 1)
-			return 1;
-		else if (x < 0.04045)
-			return x / 12.92;
-		else
-			return Math.pow((x + 0.055) / 1.055, 2.4);
-	}
+    if (x <= 0)
+      return 0;
+    else if (x >= 1)
+      return 1;
+    else if (x < 0.04045)
+      return x / 12.92;
+    else
+      return Math.pow((x + 0.055) / 1.055, 2.4);
+  }
 }

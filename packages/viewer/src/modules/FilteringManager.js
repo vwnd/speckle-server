@@ -1,10 +1,11 @@
 import * as THREE from 'three'
 import Rainbow from 'rainbowvis.js'
+import SpeckleStandardMaterial from './materials/SpeckleStandardMaterial'
 
 export default class FilteringManager {
   constructor(viewer) {
     this.viewer = viewer
-    this.WireframeMaterial = new THREE.MeshStandardMaterial({
+    this.WireframeMaterial = new SpeckleStandardMaterial({
       color: 0x7080a0,
       side: THREE.DoubleSide,
       transparent: true,
@@ -13,7 +14,7 @@ export default class FilteringManager {
     })
     // console.log(this.viewer.sectionBox.planes)
 
-    this.ColoredMaterial = new THREE.MeshStandardMaterial({
+    this.ColoredMaterial = new SpeckleStandardMaterial({
       color: 0x7080a0,
       side: THREE.DoubleSide,
       transparent: false,
