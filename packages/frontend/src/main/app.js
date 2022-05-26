@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import { SlatePlugin } from 'slate-vue'
 
 // Event hub
 Vue.prototype.$eventHub = new Vue()
@@ -19,6 +20,9 @@ import vuetify from '@/plugins/vuetify'
 // process.env.NODE_ENV is injected by Webpack
 // eslint-disable-next-line no-undef
 Vue.config.productionTip = process.env.NODE_ENV === 'development'
+
+// Slate for rich text editor, can't be async unfortunately
+Vue.use(SlatePlugin)
 
 import PortalVue from 'portal-vue'
 Vue.use(PortalVue)

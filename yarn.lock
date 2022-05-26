@@ -2881,6 +2881,8 @@ __metadata:
     prettier: ^2.5.1
     sass: ~1.32.6
     sass-loader: ^8.0.0
+    slate: ^0.78.0
+    slate-vue: ^0.2.0
     speed-measure-webpack-plugin: ^1.5.0
     tween: ^0.9.0
     uuid: ^8.3.2
@@ -9697,6 +9699,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"direction@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "direction@npm:1.0.4"
+  bin:
+    direction: cli.js
+  checksum: 572ac399093d7c9f2181c96828d252922e2a962b8f31a7fc118e3f7619592c566cc2ed313baf7703f17b2be00cd3c1402550140d0c3f4f70362976376a08b095
+  languageName: node
+  linkType: hard
+
 "dns-equal@npm:^1.0.0":
   version: 1.0.0
   resolution: "dns-equal@npm:1.0.0"
@@ -13298,6 +13309,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"immer@npm:^9.0.6":
+  version: 9.0.14
+  resolution: "immer@npm:9.0.14"
+  checksum: 17f1365c06d653e672a4f609f08e7203e9ab4b4284818332d6ca9b3f3577a0e3c0066ca7933b636fbae560df79a4b3fde70ed717ce3c6e95c39bf3d5861d5be9
+  languageName: node
+  linkType: hard
+
 "import-cwd@npm:^2.0.0":
   version: 2.1.0
   resolution: "import-cwd@npm:2.1.0"
@@ -13904,6 +13922,13 @@ __metadata:
   dependencies:
     is-extglob: ^2.1.1
   checksum: d381c1319fcb69d341cc6e6c7cd588e17cd94722d9a32dbd60660b993c4fb7d0f19438674e68dfec686d09b7c73139c9166b47597f846af387450224a8101ab4
+  languageName: node
+  linkType: hard
+
+"is-hotkey@npm:^0.1.6":
+  version: 0.1.8
+  resolution: "is-hotkey@npm:0.1.8"
+  checksum: 793d0cccaf804583d8f4b835e040d4b6a74cb3f8d4094cb8188ed7cc86e6edf8f650fc80fabd4309e6c29938f5b0e9a17b45504b29dbf92735ef8d780d613aa0
   languageName: node
   linkType: hard
 
@@ -21206,6 +21231,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"slate-vue@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "slate-vue@npm:0.2.0"
+  dependencies:
+    direction: ^1.0.4
+    is-hotkey: ^0.1.6
+    slate: ^0.59.0
+    vue: ^2.6.11
+    vue-tsx-support: ^3.0.0
+  checksum: d822ff6db11e7b2d349bca1e1724d8aefc95b5d7247e389ab2e06c012241fbb9f8563cdef7a9f3473a9e00c59781c041c11784555f082482e285385e0bb34d84
+  languageName: node
+  linkType: hard
+
+"slate@npm:^0.78.0":
+  version: 0.78.0
+  resolution: "slate@npm:0.78.0"
+  dependencies:
+    immer: ^9.0.6
+    is-plain-object: ^5.0.0
+    tiny-warning: ^1.0.3
+  checksum: 203f1a0a09a877efc4ebb8e256368ee72f71b699be064cfb4cba0f396199ea3c28a7679363a9d2c2d58011b5685c8c20f57f38bce56dbe78835d402add27cc2b
+  languageName: node
+  linkType: hard
+
 "slice-ansi@npm:0.0.4":
   version: 0.0.4
   resolution: "slice-ansi@npm:0.0.4"
@@ -22625,6 +22674,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tiny-warning@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "tiny-warning@npm:1.0.3"
+  checksum: da62c4acac565902f0624b123eed6dd3509bc9a8d30c06e017104bedcf5d35810da8ff72864400ad19c5c7806fc0a8323c68baf3e326af7cb7d969f846100d71
+  languageName: node
+  linkType: hard
+
 "tmp@npm:^0.0.33":
   version: 0.0.33
   resolution: "tmp@npm:0.0.33"
@@ -24011,6 +24067,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"vue-tsx-support@npm:^3.0.0":
+  version: 3.2.0
+  resolution: "vue-tsx-support@npm:3.2.0"
+  peerDependencies:
+    typescript: ">=3.8.0"
+    vue: ">=2.6.0"
+  checksum: 4a9e8fb3e0f27e8da3be0172100eafe5676e6cc6ad6f2e6fc837f4fcb32a9cdac72f575244c6276972cb5361ef10fd3930cf37f1751c0b647e5e43b42e1fbf37
+  languageName: node
+  linkType: hard
+
 "vue2-perfect-scrollbar@npm:^1.5.2":
   version: 1.5.5
   resolution: "vue2-perfect-scrollbar@npm:1.5.5"
@@ -24022,7 +24088,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vue@npm:^2.6.10, vue@npm:^2.6.12":
+"vue@npm:^2.6.10, vue@npm:^2.6.11, vue@npm:^2.6.12":
   version: 2.6.14
   resolution: "vue@npm:2.6.14"
   checksum: 23524a1bdca094d62cb3491a46317eed75184b5d61d28fa846ea5d2b241c1cc7084fc67ee259d47a50a6d0bbc33ecaceb7bb52bff81312fe7da07263f3419942

@@ -28,6 +28,8 @@
     "lodash": "^4.17.21",
     "numeral": "^2.0.6",
     "portal-vue": "^2.1.7",
+    "slate": "^0.78.0",
+    "slate-vue": "^0.2.0",
     "tween": "^0.9.0",
     "uuid": "^8.3.2",
     "v-tooltip": "^2.0.3",
