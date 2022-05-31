@@ -1,10 +1,10 @@
 import { Editor } from 'slate'
-import { filter, difference } from 'lodash'
+import { difference } from 'lodash'
 
 export const EditorMarks = Object.freeze({
   Bold: 'bold',
   Italic: 'italic',
-  Underline: 'underline'
+  Strikethrough: 'strike'
 })
 
 /**

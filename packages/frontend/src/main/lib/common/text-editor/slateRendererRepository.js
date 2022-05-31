@@ -71,7 +71,7 @@ export const RichTextLeafRenderer = (props) => ({
     const style = {
       fontWeight: leaf[EditorMarks.Bold] ? 'bold' : 'normal',
       fontStyle: leaf[EditorMarks.Italic] ? 'italic' : 'normal',
-      textDecoration: leaf[EditorMarks.Underline] ? 'underline' : 'none'
+      textDecoration: leaf[EditorMarks.Strikethrough] ? 'underline' : 'none'
     }
 
     return h('span', { attrs: attributes, style }, [children])

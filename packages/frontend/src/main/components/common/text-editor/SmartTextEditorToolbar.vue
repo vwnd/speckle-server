@@ -8,7 +8,7 @@
         <v-icon small>mdi-format-italic</v-icon>
       </v-btn>
       <v-btn x-small>
-        <v-icon small>mdi-format-underline</v-icon>
+        <v-icon small>mdi-format-strikethrough</v-icon>
       </v-btn>
     </v-btn-toggle>
   </div>
@@ -26,7 +26,7 @@ import { invert, toNumber, isNumber } from 'lodash'
 const formatValueMap = Object.freeze({
   0: EditorMarks.Bold,
   1: EditorMarks.Italic,
-  2: EditorMarks.Underline
+  2: EditorMarks.Strikethrough
 })
 
 export default {
@@ -35,10 +35,9 @@ export default {
     value: {
       type: Object,
       required: true,
-      default: () => ({ format: [] })
+      default: () => ({ format: {} })
     }
   },
-  data: () => ({ test: [] }),
   computed: {
     realValue: {
       get() {
@@ -51,22 +50,29 @@ export default {
     formatValues: {
       get() {
         // Convert values back to int values that vuetify expects
-        const values = this.value['format'] || []
-        return this.convertStringValuesToIntValues(values, formatValueMap)
+        const values = this.value['format'] || {}
+        const activatedValues = []
+        for (const [mark, isEnabled] of Object.entries(values)) {
+          if (isEnabled) activatedValues.push(mark)
+        }
+
+        return this.convertStringValuesToIntValues(activatedValues, formatValueMap)
       },
       set(newVal) {
         // Convert integers to more meaningful values and set into realValue
+        const newValues = {}
+        for (const [intVal, stringVal] of Object.entries(formatValueMap)) {
+          newValues[stringVal] = newVal.includes(toNumber(intVal))
+        }
+
         this.realValue = {
           ...this.realValue,
-          format: this.convertIntValuesToStringValues(newVal, formatValueMap)
+          format: newValues
         }
       }
     }
   },
   methods: {
-    convertIntValuesToStringValues(intValues, valueMap) {
-      return intValues.map((o) => valueMap[o])
-    },
     convertStringValuesToIntValues(stringValues, valueMap) {
       return stringValues
         .map((o) => {
