@@ -18,10 +18,10 @@ import HardBreak from '@tiptap/extension-hard-break'
 
 import SmartTextEditorToolbar from '@/main/components/common/text-editor/SmartTextEditorToolbar.vue'
 import { FormattingMarks } from '@/main/lib/common/text-editor/formattingHelpers'
+import { OneLineDoc } from '@/main/lib/common/text-editor/tipTapExtensions'
 
 /**
  * TODO:
- * - One line support (not multiple paragraphs)
  * - Actual user tagging
  */
 
@@ -37,20 +37,7 @@ export default {
      */
     value: {
       type: Object,
-      default: () => ({
-        type: 'doc',
-        content: [
-          {
-            type: 'paragraph',
-            content: [
-              {
-                type: 'text',
-                text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ultrices porttitor quam nec auctor. Sed et libero dui. Quisque pellentesque ipsum ex, at vehicula neque vestibulum nec. Donec scelerisque odio metus, eu egestas ligula vestibulum id. Curabitur fringilla est a enim suscipit interdum. Nullam eget tempor urna, sed auctor diam. Aenean ultrices dolor vel porttitor auctor. Donec ullamcorper gravida massa dictum lobortis. Aliquam varius gravida urna non rutrum. Donec pharetra viverra odio, id sodales massa viverra ac.'
-              }
-            ]
-          }
-        ]
-      })
+      default: undefined
     },
     multiLine: {
       type: Boolean,
@@ -97,16 +84,15 @@ export default {
   },
   mounted() {
     this.editor = new Editor({
-      content: this.value,
+      content: this.value || 'Hello world!',
       extensions: [
-        Document,
+        ...(this.multiLine ? [Document, HardBreak] : [OneLineDoc]),
         Text,
         Paragraph,
         Bold,
         Underline,
         Italic,
-        Strike,
-        HardBreak
+        Strike
       ],
       onUpdate: () => {
         this.$emit('input', this.getData())
@@ -126,5 +112,9 @@ export default {
 <style>
 .ProseMirror-focused {
   outline: none;
+}
+
+.ProseMirror p:last-of-type {
+  margin-bottom: 0px;
 }
 </style>

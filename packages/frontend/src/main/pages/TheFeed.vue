@@ -7,7 +7,7 @@
       <v-col cols="12">
         <v-card>
           <v-card-text>
-            <smart-text-editor />
+            <smart-text-editor :multi-line="false" />
           </v-card-text>
         </v-card>
       </v-col>
