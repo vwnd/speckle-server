@@ -14,7 +14,7 @@
   </div>
 </template>
 <script>
-import { EditorMarks } from '@/main/lib/common/text-editor/slateHelpers'
+import { FormattingMarks } from '@/main/lib/common/text-editor/formattingHelpers'
 import { invert, toNumber, isNumber } from 'lodash'
 
 /**
@@ -24,9 +24,9 @@ import { invert, toNumber, isNumber } from 'lodash'
  */
 
 const formatValueMap = Object.freeze({
-  0: EditorMarks.Bold,
-  1: EditorMarks.Italic,
-  2: EditorMarks.Strikethrough
+  0: FormattingMarks.Bold,
+  1: FormattingMarks.Italic,
+  2: FormattingMarks.Strikethrough
 })
 
 export default {
@@ -50,36 +50,49 @@ export default {
     formatValues: {
       get() {
         // Convert values back to int values that vuetify expects
-        const values = this.value['format'] || {}
-        const activatedValues = []
-        for (const [mark, isEnabled] of Object.entries(values)) {
-          if (isEnabled) activatedValues.push(mark)
-        }
-
-        return this.convertStringValuesToIntValues(activatedValues, formatValueMap)
+        return this.convertStringValuesToIntValues(
+          this.value['format'] || {},
+          formatValueMap
+        )
       },
       set(newVal) {
-        // Convert integers to more meaningful values and set into realValue
-        const newValues = {}
-        for (const [intVal, stringVal] of Object.entries(formatValueMap)) {
-          newValues[stringVal] = newVal.includes(toNumber(intVal))
-        }
-
+        // Convert vuetify integers to string values
         this.realValue = {
           ...this.realValue,
-          format: newValues
+          format: this.convertIntValuesToStringValues(newVal, formatValueMap)
         }
       }
     }
   },
   methods: {
+    /**
+     * Example map: {0: 'foo', 1: 'bar'}
+     * {'foo': true, 'bar': false } -> [0]
+     */
     convertStringValuesToIntValues(stringValues, valueMap) {
-      return stringValues
+      const activatedValues = []
+      for (const [mark, isEnabled] of Object.entries(stringValues)) {
+        if (isEnabled) activatedValues.push(mark)
+      }
+
+      return activatedValues
         .map((o) => {
           const val = invert(valueMap)[o]
           return val?.length ? toNumber(val) : undefined
         })
         .filter((v) => isNumber(v))
+    },
+    /**
+     * Example map: {0: 'foo', 1: 'bar'}
+     * [1] -> {'foo': false, 'bar': true}
+     */
+    convertIntValuesToStringValues(intValues, valueMap) {
+      const newValues = {}
+      for (const [intVal, stringVal] of Object.entries(valueMap)) {
+        newValues[stringVal] = intValues.includes(toNumber(intVal))
+      }
+
+      return newValues
     }
   }
 }

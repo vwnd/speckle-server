@@ -7,8 +7,5 @@
     },
     "module": "es2020"
   },
-  "include": ["src"],
-  "typeAcquisition": {
-    "include": ["slate", "slate-vue"]
-  }
+  "include": ["src"]
 }

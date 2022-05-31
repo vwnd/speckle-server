@@ -8,12 +8,12 @@
 import { Editor, EditorContent } from '@tiptap/vue-2'
 import StarterKit from '@tiptap/starter-kit'
 import SmartTextEditorToolbar from '@/main/components/common/text-editor/SmartTextEditorToolbar.vue'
-import { EditorMarks } from '@/main/lib/common/text-editor/slateHelpers'
+import { FormattingMarks } from '@/main/lib/common/text-editor/formattingHelpers'
 
 /**
  * TODO:
  * - One line support (not multiple paragraphs)
- * - Basic marks working with toolbar
+ * - Basic marks working with toolbar (90%)
  * - Actual user tagging
  */
 
@@ -31,16 +31,19 @@ export default {
       get() {
         if (!this.editor) return {}
 
-        // Read values from editor
+        // Read enabled formatting marks from editor
         const format = {
-          [EditorMarks.Bold]: this.editor.isActive(EditorMarks.Bold),
-          [EditorMarks.Italic]: this.editor.isActive(EditorMarks.Italic),
-          [EditorMarks.Strikethrough]: this.editor.isActive(EditorMarks.Strikethrough)
+          [FormattingMarks.Bold]: this.editor.isActive(FormattingMarks.Bold),
+          [FormattingMarks.Italic]: this.editor.isActive(FormattingMarks.Italic),
+          [FormattingMarks.Strikethrough]: this.editor.isActive(
+            FormattingMarks.Strikethrough
+          )
         }
 
         return { format }
       },
       set({ format }) {
+        // Apply formatting marks
         const command = this.editor.chain().focus()
         for (const [mark, isEnabled] of Object.entries(format)) {
           if (isEnabled) {
