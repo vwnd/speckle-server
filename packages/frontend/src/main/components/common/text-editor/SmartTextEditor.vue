@@ -6,8 +6,15 @@
 </template>
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-2'
-import StarterKit from '@tiptap/starter-kit'
+import Document from '@tiptap/extension-document'
+import Paragraph from '@tiptap/extension-paragraph'
+import Text from '@tiptap/extension-text'
+
 import Underline from '@tiptap/extension-underline'
+import Bold from '@tiptap/extension-bold'
+import Italic from '@tiptap/extension-italic'
+import Strike from '@tiptap/extension-strike'
+import HardBreak from '@tiptap/extension-hard-break'
 
 import SmartTextEditorToolbar from '@/main/components/common/text-editor/SmartTextEditorToolbar.vue'
 import { FormattingMarks } from '@/main/lib/common/text-editor/formattingHelpers'
@@ -23,6 +30,32 @@ export default {
   components: {
     SmartTextEditorToolbar,
     EditorContent
+  },
+  props: {
+    /**
+     * TipTap JSON content representation
+     */
+    value: {
+      type: Object,
+      default: () => ({
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ultrices porttitor quam nec auctor. Sed et libero dui. Quisque pellentesque ipsum ex, at vehicula neque vestibulum nec. Donec scelerisque odio metus, eu egestas ligula vestibulum id. Curabitur fringilla est a enim suscipit interdum. Nullam eget tempor urna, sed auctor diam. Aenean ultrices dolor vel porttitor auctor. Donec ullamcorper gravida massa dictum lobortis. Aliquam varius gravida urna non rutrum. Donec pharetra viverra odio, id sodales massa viverra ac.'
+              }
+            ]
+          }
+        ]
+      })
+    },
+    multiLine: {
+      type: Boolean,
+      default: true
+    }
   },
   data: () => ({
     editor: null
@@ -54,31 +87,29 @@ export default {
       }
     }
   },
+  watch: {
+    value(newVal) {
+      const isSame = JSON.stringify(this.getData()) === JSON.stringify(newVal)
+      if (isSame) return
+
+      this.editor.commands.setContent(newVal, false)
+    }
+  },
   mounted() {
     this.editor = new Editor({
-      content:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ultrices porttitor quam nec auctor. Sed et libero dui. Quisque pellentesque ipsum ex, at vehicula neque vestibulum nec. Donec scelerisque odio metus, eu egestas ligula vestibulum id. Curabitur fringilla est a enim suscipit interdum. Nullam eget tempor urna, sed auctor diam. Aenean ultrices dolor vel porttitor auctor. Donec ullamcorper gravida massa dictum lobortis. Aliquam varius gravida urna non rutrum. Donec pharetra viverra odio, id sodales massa viverra ac.',
+      content: this.value,
       extensions: [
-        StarterKit.configure({
-          // TODO: Switch to specific extensions we need for decreased bundle size
-          // Only enabled: bold, italic, strike
-          blockquote: false,
-          bulletList: false,
-          code: false,
-          codeBlock: false,
-          heading: false,
-          history: false,
-          horizontalRule: false,
-          listItem: false,
-          orderedList: false
-        }),
-        Underline
+        Document,
+        Text,
+        Paragraph,
+        Bold,
+        Underline,
+        Italic,
+        Strike,
+        HardBreak
       ],
       onUpdate: () => {
-        const json = this.getData()
-
-        console.log(new Date().toISOString(), json)
-        this.$emit('input', json)
+        this.$emit('input', this.getData())
       }
     })
   },
