@@ -6,6 +6,8 @@
  * }} SlateVueElementRendererProps
  */
 
+import { EditorMarks } from '@/main/lib/common/text-editor/slateHelpers'
+
 /**
  * @typedef {{
  *  children: any,
@@ -67,7 +69,9 @@ export const RichTextLeafRenderer = (props) => ({
   render(h) {
     const { attributes, children, leaf } = props
     const style = {
-      fontWeight: leaf.bold ? 'bold' : 'normal'
+      fontWeight: leaf[EditorMarks.Bold] ? 'bold' : 'normal',
+      fontStyle: leaf[EditorMarks.Italic] ? 'italic' : 'normal',
+      textDecoration: leaf[EditorMarks.Underline] ? 'underline' : 'none'
     }
 
     return h('span', { attrs: attributes, style }, [children])

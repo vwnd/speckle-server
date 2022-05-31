@@ -3,9 +3,13 @@
     <portal v-if="canRenderToolbarPortal" to="toolbar">
       <div class="font-weight-bold">Feed</div>
     </portal>
-    <v-row style="background-color: blue; padding: 12px">
+    <v-row>
       <v-col cols="12">
-        <smart-text-editor />
+        <v-card>
+          <v-card-text>
+            <smart-text-editor />
+          </v-card-text>
+        </v-card>
       </v-col>
     </v-row>
     <v-row>
