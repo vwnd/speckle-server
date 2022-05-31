@@ -1,5 +1,6 @@
 export const FormattingMarks = Object.freeze({
   Bold: 'bold',
   Italic: 'italic',
-  Strikethrough: 'strike'
+  Strikethrough: 'strike',
+  Underline: 'underline'
 })

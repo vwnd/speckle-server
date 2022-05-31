@@ -2859,6 +2859,7 @@ __metadata:
   dependencies:
     "@mdi/font": ^5.8.55
     "@speckle/viewer": "workspace:^"
+    "@tiptap/extension-underline": ^2.0.0-beta.23
     "@tiptap/starter-kit": ^2.0.0-beta.185
     "@tiptap/vue-2": ^2.0.0-beta.79
     "@tryghost/content-api": ^1.5.12
@@ -3388,6 +3389,15 @@ __metadata:
   peerDependencies:
     "@tiptap/core": ^2.0.0-beta.1
   checksum: a8937c2a6c356f25d7f29086f8fa8e71e5198a4c389f1701da6bb024c5a1b4370e684a6051d5139b15680b45b6ade8626f6e15b21e8fd73d7a9cc4c8eb129b81
+  languageName: node
+  linkType: hard
+
+"@tiptap/extension-underline@npm:^2.0.0-beta.23":
+  version: 2.0.0-beta.23
+  resolution: "@tiptap/extension-underline@npm:2.0.0-beta.23"
+  peerDependencies:
+    "@tiptap/core": ^2.0.0-beta.1
+  checksum: 96a5b2d9a5fe31dcfc4272d54aefe62ca50e1ce41cca5d9314997188ab6d82f6bb5913b2bf38736071f28c8c1a54ed82d2cad76e524db381e48cd835b2cac301
   languageName: node
   linkType: hard
 

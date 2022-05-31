@@ -8,6 +8,9 @@
         <v-icon small>mdi-format-italic</v-icon>
       </v-btn>
       <v-btn x-small>
+        <v-icon small>mdi-format-underline</v-icon>
+      </v-btn>
+      <v-btn x-small>
         <v-icon small>mdi-format-strikethrough</v-icon>
       </v-btn>
     </v-btn-toggle>
@@ -26,7 +29,8 @@ import { invert, toNumber, isNumber } from 'lodash'
 const formatValueMap = Object.freeze({
   0: FormattingMarks.Bold,
   1: FormattingMarks.Italic,
-  2: FormattingMarks.Strikethrough
+  2: FormattingMarks.Underline,
+  3: FormattingMarks.Strikethrough
 })
 
 export default {

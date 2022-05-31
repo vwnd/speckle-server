@@ -7,13 +7,14 @@
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-2'
 import StarterKit from '@tiptap/starter-kit'
+import Underline from '@tiptap/extension-underline'
+
 import SmartTextEditorToolbar from '@/main/components/common/text-editor/SmartTextEditorToolbar.vue'
 import { FormattingMarks } from '@/main/lib/common/text-editor/formattingHelpers'
 
 /**
  * TODO:
  * - One line support (not multiple paragraphs)
- * - Basic marks working with toolbar (90%)
  * - Actual user tagging
  */
 
@@ -32,12 +33,9 @@ export default {
         if (!this.editor) return {}
 
         // Read enabled formatting marks from editor
-        const format = {
-          [FormattingMarks.Bold]: this.editor.isActive(FormattingMarks.Bold),
-          [FormattingMarks.Italic]: this.editor.isActive(FormattingMarks.Italic),
-          [FormattingMarks.Strikethrough]: this.editor.isActive(
-            FormattingMarks.Strikethrough
-          )
+        const format = {}
+        for (const mark of Object.values(FormattingMarks)) {
+          format[mark] = this.editor.isActive(mark)
         }
 
         return { format }
@@ -73,7 +71,8 @@ export default {
           horizontalRule: false,
           listItem: false,
           orderedList: false
-        })
+        }),
+        Underline
       ],
       onUpdate: () => {
         const json = this.getData()
