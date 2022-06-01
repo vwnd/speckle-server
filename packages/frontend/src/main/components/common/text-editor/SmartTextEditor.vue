@@ -1,7 +1,16 @@
 <template>
   <div class="d-flex flex-column">
-    <smart-text-editor-toolbar v-model="toolbarModel" />
+    <smart-text-editor-toolbar
+      :formats.sync="formatsValue"
+      :link="linkValue"
+      @link="onLinkClick"
+      @unlink="onUnlinkClick"
+    />
     <editor-content :editor="editor" />
+    <smart-text-editor-link-dialog
+      v-model="linkDialogData"
+      @submit="onLinkDialogSubmit"
+    />
   </div>
 </template>
 <script>
@@ -14,41 +23,56 @@ import Underline from '@tiptap/extension-underline'
 import Bold from '@tiptap/extension-bold'
 import Italic from '@tiptap/extension-italic'
 import Strike from '@tiptap/extension-strike'
+import Link from '@tiptap/extension-link'
 import HardBreak from '@tiptap/extension-hard-break'
 
 import SmartTextEditorToolbar from '@/main/components/common/text-editor/SmartTextEditorToolbar.vue'
-import { FormattingMarks } from '@/main/lib/common/text-editor/formattingHelpers'
-import { OneLineDoc } from '@/main/lib/common/text-editor/tipTapExtensions'
+import {
+  FormattingMarks,
+  LinkOptions
+} from '@/main/lib/common/text-editor/formattingHelpers'
+import {
+  InlineDoc,
+  UtilitiesExtension
+} from '@/main/lib/common/text-editor/tipTapExtensions'
+import SmartTextEditorLinkDialog from '@/main/components/common/text-editor/SmartTextEditorLinkDialog.vue'
+import { VALID_HTTP_URL } from '@/main/lib/common/vuetify/validators'
 
 /**
  * TODO:
  * - Actual user tagging
+ * - Support for basic links
  */
 
 export default {
   name: 'SmartTextEditor',
   components: {
     SmartTextEditorToolbar,
-    EditorContent
+    EditorContent,
+    SmartTextEditorLinkDialog
   },
   props: {
     /**
-     * TipTap JSON content representation
+     * TipTap/ProseMirror JSON content representation
      */
     value: {
       type: Object,
       default: undefined
     },
+    /**
+     * Whether to allow multi-line & multi-paragraph text
+     */
     multiLine: {
       type: Boolean,
       default: true
     }
   },
   data: () => ({
-    editor: null
+    editor: null,
+    linkDialogData: null
   }),
   computed: {
-    toolbarModel: {
+    formatsValue: {
       get() {
         if (!this.editor) return {}
 
@@ -58,12 +82,12 @@ export default {
           format[mark] = this.editor.isActive(mark)
         }
 
-        return { format }
+        return format
       },
-      set({ format }) {
+      set(newVal) {
         // Apply formatting marks
         const command = this.editor.chain().focus()
-        for (const [mark, isEnabled] of Object.entries(format)) {
+        for (const [mark, isEnabled] of Object.entries(newVal)) {
           if (isEnabled) {
             command.setMark(mark)
           } else {
@@ -72,6 +96,18 @@ export default {
         }
         command.run()
       }
+    },
+    linkValue() {
+      if (!this.editor) return {}
+
+      // Read link button states from editor
+      const isLinkActive = this.editor.isActive('link')
+      const link = {
+        [LinkOptions.Link]: isLinkActive,
+        [LinkOptions.Unlink]: isLinkActive
+      }
+
+      return link
     }
   },
   watch: {
@@ -84,15 +120,21 @@ export default {
   },
   mounted() {
     this.editor = new Editor({
-      content: this.value || 'Hello world!',
+      content: this.value || '',
       extensions: [
-        ...(this.multiLine ? [Document, HardBreak] : [OneLineDoc]),
+        ...(this.multiLine ? [Document, HardBreak] : [InlineDoc]),
+        UtilitiesExtension,
         Text,
         Paragraph,
         Bold,
         Underline,
         Italic,
-        Strike
+        Strike,
+        Link.configure({
+          // Only allow http protocol links (no JS)
+          validate: (href) => VALID_HTTP_URL.test(href),
+          openOnClick: false
+        })
       ],
       onUpdate: () => {
         this.$emit('input', this.getData())
@@ -105,6 +147,36 @@ export default {
   methods: {
     getData() {
       return this.editor.getJSON()
+    },
+    onUnlinkClick() {
+      this.editor.chain().focus().unsetLink().run()
+    },
+    onLinkClick(e) {
+      // https://vuetifyjs.com/en/components/dialogs/#without-activator
+      e.stopPropagation()
+
+      // Get currently selected link data, if any
+      const { href } = this.editor.getAttributes('link') || {}
+
+      // If cursor is on a link, use its full title, otherwise just get selected text
+      const selectedText = this.editor.isActive('link')
+        ? this.editor.commands.getLinkText() || ''
+        : this.editor.commands.getSelectedText() || ''
+
+      this.linkDialogData = {
+        url: href,
+        title: selectedText
+      }
+    },
+    onLinkDialogSubmit({ title, url }) {
+      // Add/update link
+      this.editor
+        .chain()
+        .focus()
+        .extendMarkRange('link')
+        .setLink({ href: url })
+        .insertContent(title)
+        .run()
     }
   }
 }

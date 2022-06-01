@@ -4,3 +4,8 @@ export const FormattingMarks = Object.freeze({
   Strikethrough: 'strike',
   Underline: 'underline'
 })
+
+export const LinkOptions = Object.freeze({
+  Link: 'link',
+  Unlink: 'unlink'
+})

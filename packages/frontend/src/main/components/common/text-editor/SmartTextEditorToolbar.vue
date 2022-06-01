@@ -1,102 +1,109 @@
 <template>
-  <div class="d-flex mb-1">
-    <v-btn-toggle v-model="formatValues" dense multiple>
-      <v-btn x-small>
+  <div class="d-flex flex-wrap mb-1">
+    <!-- Text formatting settings -->
+    <div class="d-flex">
+      <smart-text-editor-toolbar-btn v-model="boldValue">
         <v-icon small>mdi-format-bold</v-icon>
-      </v-btn>
-      <v-btn x-small>
+      </smart-text-editor-toolbar-btn>
+      <smart-text-editor-toolbar-btn v-model="italicValue">
         <v-icon small>mdi-format-italic</v-icon>
-      </v-btn>
-      <v-btn x-small>
+      </smart-text-editor-toolbar-btn>
+      <smart-text-editor-toolbar-btn v-model="underlineValue">
         <v-icon small>mdi-format-underline</v-icon>
-      </v-btn>
-      <v-btn x-small>
+      </smart-text-editor-toolbar-btn>
+      <smart-text-editor-toolbar-btn v-model="strikeValue">
         <v-icon small>mdi-format-strikethrough</v-icon>
-      </v-btn>
-    </v-btn-toggle>
+      </smart-text-editor-toolbar-btn>
+    </div>
+    <!-- Link/unlink -->
+    <div class="d-flex ml-2">
+      <smart-text-editor-toolbar-btn
+        :value="link[LinkOptions.Link] || false"
+        @click="onLinkClick"
+      >
+        <v-icon small>mdi-link</v-icon>
+      </smart-text-editor-toolbar-btn>
+      <smart-text-editor-toolbar-btn
+        :value="link[LinkOptions.Unlink] || false"
+        @click="onUnlinkClick"
+      >
+        <v-icon small>mdi-link-off</v-icon>
+      </smart-text-editor-toolbar-btn>
+    </div>
   </div>
 </template>
 <script>
-import { FormattingMarks } from '@/main/lib/common/text-editor/formattingHelpers'
-import { invert, toNumber, isNumber } from 'lodash'
-
-/**
- * IMPORTANT NOTE: If you change the order of buttons inside <v-btn-toggle>, make sure you update
- * the value conversion functions as well, because the value of each button is also its position
- * in the button group (starting from 0).
- */
-
-const formatValueMap = Object.freeze({
-  0: FormattingMarks.Bold,
-  1: FormattingMarks.Italic,
-  2: FormattingMarks.Underline,
-  3: FormattingMarks.Strikethrough
-})
+import {
+  FormattingMarks,
+  LinkOptions
+} from '@/main/lib/common/text-editor/formattingHelpers'
+import SmartTextEditorToolbarBtn from '@/main/components/common/text-editor/SmartTextEditorToolbarBtn.vue'
+import { reduce } from 'lodash'
 
 export default {
   name: 'SmartTextEditorToolbar',
+  components: {
+    SmartTextEditorToolbarBtn
+  },
   props: {
-    value: {
+    formats: {
       type: Object,
-      required: true,
-      default: () => ({ format: {} })
+      default: () => ({})
+    },
+    link: {
+      type: Object,
+      default: () => ({})
     }
   },
+  data: () => ({ FormattingMarks, LinkOptions }),
   computed: {
-    realValue: {
-      get() {
-        return this.value
-      },
-      set(newVal) {
-        this.$emit('input', newVal)
-      }
-    },
-    formatValues: {
-      get() {
-        // Convert values back to int values that vuetify expects
-        return this.convertStringValuesToIntValues(
-          this.value['format'] || {},
-          formatValueMap
-        )
-      },
-      set(newVal) {
-        // Convert vuetify integers to string values
-        this.realValue = {
-          ...this.realValue,
-          format: this.convertIntValuesToStringValues(newVal, formatValueMap)
+    // boldValue, italicValue... etc.
+    ...reduce(
+      Object.values(FormattingMarks),
+      (result, mark) => {
+        result[mark + 'Value'] = {
+          get() {
+            return this.realFormats[mark] || false
+          },
+          set(newVal) {
+            this.setNewFormatValue(mark, newVal)
+          }
         }
+        return result
+      },
+      {}
+    ),
+    realFormats: {
+      get() {
+        return this.formats
+      },
+      set(newVal) {
+        this.$emit('update:formats', newVal)
       }
     }
   },
   methods: {
-    /**
-     * Example map: {0: 'foo', 1: 'bar'}
-     * {'foo': true, 'bar': false } -> [0]
-     */
-    convertStringValuesToIntValues(stringValues, valueMap) {
-      const activatedValues = []
-      for (const [mark, isEnabled] of Object.entries(stringValues)) {
-        if (isEnabled) activatedValues.push(mark)
-      }
-
-      return activatedValues
-        .map((o) => {
-          const val = invert(valueMap)[o]
-          return val?.length ? toNumber(val) : undefined
-        })
-        .filter((v) => isNumber(v))
+    onLinkClick(e) {
+      this.$emit('link', e)
     },
-    /**
-     * Example map: {0: 'foo', 1: 'bar'}
-     * [1] -> {'foo': false, 'bar': true}
-     */
-    convertIntValuesToStringValues(intValues, valueMap) {
-      const newValues = {}
-      for (const [intVal, stringVal] of Object.entries(valueMap)) {
-        newValues[stringVal] = intValues.includes(toNumber(intVal))
-      }
+    onUnlinkClick(e) {
+      if (!this.link[LinkOptions.Unlink]) return
+      this.$emit('unlink', e)
+    },
 
-      return newValues
+    setNewFormatValue(format, val) {
+      const currentFormats = this.realFormats
+      this.realFormats = {
+        ...currentFormats,
+        [format]: val
+      }
+    },
+    setNewLinkValue(linkOpt, val) {
+      const currentLink = this.realLink
+      this.realLink = {
+        ...currentLink,
+        [linkOpt]: val
+      }
     }
   }
 }

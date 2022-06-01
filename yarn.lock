@@ -2864,6 +2864,7 @@ __metadata:
     "@tiptap/extension-document": ^2.0.0-beta.15
     "@tiptap/extension-hard-break": ^2.0.0-beta.30
     "@tiptap/extension-italic": ^2.0.0-beta.26
+    "@tiptap/extension-link": ^2.0.0-beta.38
     "@tiptap/extension-paragraph": ^2.0.0-beta.23
     "@tiptap/extension-strike": ^2.0.0-beta.27
     "@tiptap/extension-text": ^2.0.0-beta.15
@@ -3257,6 +3258,19 @@ __metadata:
   peerDependencies:
     "@tiptap/core": ^2.0.0-beta.1
   checksum: 374d99f9b2bcaa398da11c8d514bc6c69c25bb95007b29de0da6d630424e95f7701032994bc762571e30f0b46f11839a5699d5ba64549b50e1ab516a20f91a6e
+  languageName: node
+  linkType: hard
+
+"@tiptap/extension-link@npm:^2.0.0-beta.38":
+  version: 2.0.0-beta.38
+  resolution: "@tiptap/extension-link@npm:2.0.0-beta.38"
+  dependencies:
+    linkifyjs: ^3.0.5
+    prosemirror-model: ^1.16.1
+    prosemirror-state: ^1.3.4
+  peerDependencies:
+    "@tiptap/core": ^2.0.0-beta.1
+  checksum: 0ec15645e11c9b6cf29235e08f55901f825227d8d877c62fff9a5aa25d19b3b63ade6426a1ddb3522c44a61ea37225294954f5b297711432d6d2a82244682314
   languageName: node
   linkType: hard
 
@@ -15813,6 +15827,13 @@ __metadata:
   dependencies:
     create-html-element: ^4.0.1
   checksum: 2cacc2743df081574828941d11e058b9e3b68d6f99bac009b5d8dfa69d3fa4998c71c41475505745e050302be777b12ac9423ec5277b877796f575a67e5a58d0
+  languageName: node
+  linkType: hard
+
+"linkifyjs@npm:^3.0.5":
+  version: 3.0.5
+  resolution: "linkifyjs@npm:3.0.5"
+  checksum: a926669022f41db6464071d3df2b2de71531d5a83db478e0e0b16617cbabde32c89ff0f46406927d53b31eb8f7501b7bb53410aedf05890c38900a55a1cc5283
   languageName: node
   linkType: hard
 
