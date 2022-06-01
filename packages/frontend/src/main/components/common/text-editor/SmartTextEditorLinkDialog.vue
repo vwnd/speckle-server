@@ -9,6 +9,7 @@
               <v-col cols="12">
                 <v-text-field
                   v-model="formDataState.title"
+                  autofocus
                   label="Title"
                   :rules="validators.title"
                 ></v-text-field>

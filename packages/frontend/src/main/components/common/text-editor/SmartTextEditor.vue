@@ -25,6 +25,7 @@ import Italic from '@tiptap/extension-italic'
 import Strike from '@tiptap/extension-strike'
 import Link from '@tiptap/extension-link'
 import HardBreak from '@tiptap/extension-hard-break'
+import { TextSelection } from 'prosemirror-state'
 
 import SmartTextEditorToolbar from '@/main/components/common/text-editor/SmartTextEditorToolbar.vue'
 import {
@@ -41,7 +42,7 @@ import { VALID_HTTP_URL } from '@/main/lib/common/vuetify/validators'
 /**
  * TODO:
  * - Actual user tagging
- * - Support for basic links
+ * - Links continuing on after space
  */
 
 export default {
@@ -133,10 +134,14 @@ export default {
         Link.configure({
           // Only allow http protocol links (no JS)
           validate: (href) => VALID_HTTP_URL.test(href),
-          openOnClick: false
+          // Open on click would be too annoying during editing
+          openOnClick: false,
+          // Autolink off cause otherwise it's impossible to end the link
+          autolink: false
         })
       ],
       onUpdate: () => {
+        console.log(this.getData())
         this.$emit('input', this.getData())
       }
     })
@@ -168,15 +173,47 @@ export default {
         title: selectedText
       }
     },
+    /**
+     * Add/update link with new title & URL
+     */
     onLinkDialogSubmit({ title, url }) {
-      // Add/update link
-      this.editor
-        .chain()
-        .focus()
-        .extendMarkRange('link')
-        .setLink({ href: url })
-        .insertContent(title)
-        .run()
+      const chain = this.editor.chain().focus()
+
+      // Change selection to entire link, if part of it is selected
+      const linkActive = this.editor.isActive('link')
+      if (linkActive) {
+        chain.extendMarkRange('link')
+      }
+
+      // Insert (& replace old, if selection isnt empty) new title
+      chain.insertContent(title)
+
+      // Select newly created text
+      chain.command((cmdProps) => {
+        const { tr } = cmdProps
+
+        // Select the newly added text
+        const selection = tr.selection
+        const $anchor = tr.selection.$anchor // insertContent() moves selection to the end of the new text
+        const $head = tr.doc.resolve(selection.anchor - title.length)
+
+        const newSelection = new TextSelection($anchor, $head)
+        tr.setSelection(newSelection)
+      })
+
+      // Set it to be a link
+      chain.setLink({ href: url })
+
+      // Collapse selection to point to the end of the link
+      chain.command((cmdProps) => {
+        const { tr } = cmdProps
+
+        const newSelection = new TextSelection(tr.selection.$to)
+        tr.setSelection(newSelection)
+      })
+
+      // Run chain
+      chain.run()
     }
   }
 }
