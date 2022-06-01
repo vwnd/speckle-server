@@ -82,6 +82,22 @@ export default {
       }
     }
   },
+  mounted() {
+    /**
+     * @param {KeyboardEvent} event
+     */
+    this.keydownListener = (event) => {
+      // Track Cmd/Ctrl+K for link modal
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+        event.preventDefault()
+        this.$emit('link', event)
+      }
+    }
+    document.addEventListener('keydown', this.keydownListener)
+  },
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.keydownListener)
+  },
   methods: {
     onLinkClick(e) {
       this.$emit('link', e)
