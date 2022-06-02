@@ -1,21 +1,24 @@
 <template>
-  <div class="items mention-list">
-    <template v-if="items.length">
-      <button
-        v-for="(item, index) in items"
-        :key="index"
-        class="item"
-        :class="{ 'is-selected': index === selectedIndex }"
-        @click="selectItem(index)"
-      >
-        {{ item }}
-      </button>
-    </template>
-    <div v-else class="item">No result</div>
-  </div>
+  <v-card class="items mention-list">
+    <v-card-text>
+      <template v-if="items.length">
+        <button
+          v-for="(item, index) in items"
+          :key="index"
+          class="item"
+          :class="{ 'is-selected': index === selectedIndex }"
+          @click="selectItem(index)"
+        >
+          {{ item }}
+        </button>
+      </template>
+      <div v-else class="item">No result</div>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
+// TODO: Get vuetify theme etc., this is a separate Vue app
 export default {
   name: 'SmartTextEditorMentionList',
   props: {
@@ -75,6 +78,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.mention-list {
+  z-index: 10000; // same as tooltips
+}
+
 .items {
   padding: 0.2rem;
   position: relative;

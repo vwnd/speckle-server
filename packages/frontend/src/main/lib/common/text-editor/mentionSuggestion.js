@@ -74,6 +74,7 @@ export const suggestion = {
         )
 
         // Init click handler for hiding when clicking outside of the popper
+        // TODO: Add dep?
         /** @param {MouseEvent} e */
         clickHandler = (e) => {
           /** @type {Element} */
