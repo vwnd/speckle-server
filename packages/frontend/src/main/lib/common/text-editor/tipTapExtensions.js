@@ -1,5 +1,19 @@
+import Document from '@tiptap/extension-document'
+import Paragraph from '@tiptap/extension-paragraph'
+import Text from '@tiptap/extension-text'
+import Underline from '@tiptap/extension-underline'
+import Bold from '@tiptap/extension-bold'
+import Italic from '@tiptap/extension-italic'
+import Strike from '@tiptap/extension-strike'
+import Link from '@tiptap/extension-link'
+import HardBreak from '@tiptap/extension-hard-break'
+import Mention from '@tiptap/extension-mention'
+
 import { Node, Extension } from '@tiptap/core'
 import { TextSelection } from 'prosemirror-state'
+import { VALID_HTTP_URL } from '@/main/lib/common/vuetify/validators'
+
+import { suggestion } from '@/main/lib/common/text-editor/mentionSuggestion'
 
 /**
  * Document node that only supports inline content (no paragraphs or line breaks)
@@ -116,3 +130,30 @@ export const UtilitiesExtension = Extension.create({
     }
   }
 })
+
+/**
+ * Get TipTap editor extensions that should be loaded in the editor
+ */
+export function getEditorExtensions({ multiLine = true }) {
+  return [
+    ...(multiLine ? [Document, HardBreak] : [InlineDoc]),
+    UtilitiesExtension,
+    Text,
+    Paragraph,
+    Bold,
+    Underline,
+    Italic,
+    Strike,
+    Link.configure({
+      // Only allow http protocol links (no JS)
+      validate: (href) => VALID_HTTP_URL.test(href),
+      // Open on click would be too annoying during editing
+      openOnClick: false,
+      // Autolink off cause otherwise it's impossible to end the link
+      autolink: false
+    }),
+    Mention.configure({
+      suggestion
+    })
+  ]
+}

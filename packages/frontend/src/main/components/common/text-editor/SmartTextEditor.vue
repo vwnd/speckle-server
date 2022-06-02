@@ -11,32 +11,18 @@
       v-model="linkDialogData"
       @submit="onLinkDialogSubmit"
     />
+    <div class="editor-mount-point" />
   </div>
 </template>
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-2'
-import Document from '@tiptap/extension-document'
-import Paragraph from '@tiptap/extension-paragraph'
-import Text from '@tiptap/extension-text'
-
-import Underline from '@tiptap/extension-underline'
-import Bold from '@tiptap/extension-bold'
-import Italic from '@tiptap/extension-italic'
-import Strike from '@tiptap/extension-strike'
-import Link from '@tiptap/extension-link'
-import HardBreak from '@tiptap/extension-hard-break'
-
 import SmartTextEditorToolbar from '@/main/components/common/text-editor/SmartTextEditorToolbar.vue'
 import {
   FormattingMarks,
   LinkOptions
 } from '@/main/lib/common/text-editor/formattingHelpers'
-import {
-  InlineDoc,
-  UtilitiesExtension
-} from '@/main/lib/common/text-editor/tipTapExtensions'
+import { getEditorExtensions } from '@/main/lib/common/text-editor/tipTapExtensions'
 import SmartTextEditorLinkDialog from '@/main/components/common/text-editor/SmartTextEditorLinkDialog.vue'
-import { VALID_HTTP_URL } from '@/main/lib/common/vuetify/validators'
 
 /**
  * TODO:
@@ -120,24 +106,7 @@ export default {
   mounted() {
     this.editor = new Editor({
       content: this.value || '',
-      extensions: [
-        ...(this.multiLine ? [Document, HardBreak] : [InlineDoc]),
-        UtilitiesExtension,
-        Text,
-        Paragraph,
-        Bold,
-        Underline,
-        Italic,
-        Strike,
-        Link.configure({
-          // Only allow http protocol links (no JS)
-          validate: (href) => VALID_HTTP_URL.test(href),
-          // Open on click would be too annoying during editing
-          openOnClick: false,
-          // Autolink off cause otherwise it's impossible to end the link
-          autolink: false
-        })
-      ],
+      extensions: getEditorExtensions({ multiLine: this.multiLine }),
       onUpdate: () => {
         console.log(this.getData())
         this.$emit('input', this.getData())
