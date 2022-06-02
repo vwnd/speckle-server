@@ -20,7 +20,8 @@
     "test": "cross-env NODE_ENV=test mocha",
     "test:coverage": "cross-env NODE_ENV=test nyc --reporter lcov mocha",
     "test:report": "yarn test:coverage -- --reporter mocha-junit-reporter --reporter-options mochaFile=reports/test-results.xml",
-    "lint": "eslint . --ext .js,.ts"
+    "lint": "eslint . --ext .js,.ts",
+    "cli": "./bin/cli"
   },
   "dependencies": {
     "@godaddy/terminus": "^4.9.0",
@@ -76,6 +77,7 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.1.0",
     "@types/lodash": "^4.14.180",
     "@types/mocha": "^7.0.2",
     "@types/module-alias": "^2.0.1",
