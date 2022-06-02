@@ -5,11 +5,7 @@
     </portal>
     <v-row>
       <v-col cols="12">
-        <v-card>
-          <v-card-text>
-            <smart-text-editor :multi-line="false" />
-          </v-card-text>
-        </v-card>
+        <smart-text-editor :multi-line="false" />
       </v-col>
     </v-row>
     <v-row>

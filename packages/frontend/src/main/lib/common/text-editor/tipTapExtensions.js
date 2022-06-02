@@ -8,6 +8,7 @@ import Strike from '@tiptap/extension-strike'
 import Link from '@tiptap/extension-link'
 import HardBreak from '@tiptap/extension-hard-break'
 import Mention from '@tiptap/extension-mention'
+import History from '@tiptap/extension-history'
 
 import { Node, Extension } from '@tiptap/core'
 import { TextSelection } from 'prosemirror-state'
@@ -154,6 +155,7 @@ export function getEditorExtensions({ multiLine = true }) {
     }),
     Mention.configure({
       suggestion
-    })
+    }),
+    History
   ]
 }

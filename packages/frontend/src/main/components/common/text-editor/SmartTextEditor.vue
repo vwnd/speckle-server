@@ -1,18 +1,24 @@
 <template>
-  <div class="d-flex flex-column">
-    <smart-text-editor-toolbar
-      :formats.sync="formatsValue"
-      :link="linkValue"
-      @link="onLinkClick"
-      @unlink="onUnlinkClick"
-    />
-    <editor-content :editor="editor" />
-    <smart-text-editor-link-dialog
-      v-model="linkDialogData"
-      @submit="onLinkDialogSubmit"
-    />
-    <div class="editor-mount-point" />
-  </div>
+  <v-card class="smart-text-editor">
+    <v-card-text class="d-flex flex-column">
+      <smart-text-editor-toolbar
+        :formats.sync="formatsValue"
+        :link="linkValue"
+        @link="onLinkClick"
+        @unlink="onUnlinkClick"
+      />
+      <editor-content
+        class="simple-scrollbar"
+        :editor="editor"
+        :style="maxHeight ? `max-height: ${maxHeight}; overflow-y: auto;` : ''"
+      />
+      <smart-text-editor-link-dialog
+        v-model="linkDialogData"
+        @submit="onLinkDialogSubmit"
+      />
+      <div class="editor-mount-point" />
+    </v-card-text>
+  </v-card>
 </template>
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-2'
@@ -50,6 +56,13 @@ export default {
     multiLine: {
       type: Boolean,
       default: true
+    },
+    /**
+     * If set, will limit height and show a scrollbar
+     */
+    maxHeight: {
+      type: String,
+      default: null
     }
   },
   data: () => ({
@@ -149,7 +162,7 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="scss">
 .ProseMirror-focused {
   outline: none;
 }

@@ -2870,6 +2870,7 @@ __metadata:
     "@tiptap/extension-bold": ^2.0.0-beta.26
     "@tiptap/extension-document": ^2.0.0-beta.15
     "@tiptap/extension-hard-break": ^2.0.0-beta.30
+    "@tiptap/extension-history": ^2.0.0-beta.21
     "@tiptap/extension-italic": ^2.0.0-beta.26
     "@tiptap/extension-link": ^2.0.0-beta.38
     "@tiptap/extension-mention": ^2.0.0-beta.97
@@ -3258,6 +3259,18 @@ __metadata:
   peerDependencies:
     "@tiptap/core": ^2.0.0-beta.1
   checksum: d0f23d0bbcc40c3097ed2c2d8ce2b2b7a3986336bd37d2e39e3a3bef7dd02780ec2c3b79692ac18407cf68e18254c6a494e8ebf092143505611fb23d6b8be393
+  languageName: node
+  linkType: hard
+
+"@tiptap/extension-history@npm:^2.0.0-beta.21":
+  version: 2.0.0-beta.21
+  resolution: "@tiptap/extension-history@npm:2.0.0-beta.21"
+  dependencies:
+    "@types/prosemirror-history": ^1.0.3
+    prosemirror-history: ^1.2.0
+  peerDependencies:
+    "@tiptap/core": ^2.0.0-beta.1
+  checksum: ee9a1df5e9e1ee522fcf5362c29f7c844b93f3ec3ad0c61dd772f1a255fb06f7db42733ca1606c097bf370ae8f190670801e996c4599fad57bafbe351e94543e
   languageName: node
   linkType: hard
 
@@ -3852,6 +3865,16 @@ __metadata:
     "@types/prosemirror-state": "*"
     "@types/prosemirror-view": "*"
   checksum: 9fd1d68d0edc06322dc4cb728a3eb2fa5a00b968f962f124c1c7e877584aea76b14f9b982b2bede41ecf4adadb4b0bf02159c321bb7d5864f15165643505d366
+  languageName: node
+  linkType: hard
+
+"@types/prosemirror-history@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@types/prosemirror-history@npm:1.0.3"
+  dependencies:
+    "@types/prosemirror-model": "*"
+    "@types/prosemirror-state": "*"
+  checksum: d1c9b4d2f603ac60895db711ff6eeda6ea7d81eb65754a878a2d9f8f64e66e0737e8ac33a3a1ab22a6597fd84e954a593bf2f39c47cbdbc4bb524bdad422b432
   languageName: node
   linkType: hard
 
@@ -19808,6 +19831,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prosemirror-history@npm:^1.2.0":
+  version: 1.3.0
+  resolution: "prosemirror-history@npm:1.3.0"
+  dependencies:
+    prosemirror-state: ^1.2.2
+    prosemirror-transform: ^1.0.0
+    rope-sequence: ^1.3.0
+  checksum: 023feff7022ae4a67a5d796e20b07c21fd6b24f819cb5295fb0be31c3d9aeb0df1df6d92c09c7662b50d18bae4fb93e4ba6a78c18be0a303a6bf627fa121b885
+  languageName: node
+  linkType: hard
+
 "prosemirror-keymap@npm:^1.1.5":
   version: 1.2.0
   resolution: "prosemirror-keymap@npm:1.2.0"
@@ -19838,7 +19872,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prosemirror-state@npm:^1.0.0, prosemirror-state@npm:^1.3.4":
+"prosemirror-state@npm:^1.0.0, prosemirror-state@npm:^1.2.2, prosemirror-state@npm:^1.3.4":
   version: 1.4.0
   resolution: "prosemirror-state@npm:1.4.0"
   dependencies:
@@ -20930,6 +20964,13 @@ __metadata:
     prettier: ^2.5.1
   languageName: unknown
   linkType: soft
+
+"rope-sequence@npm:^1.3.0":
+  version: 1.3.3
+  resolution: "rope-sequence@npm:1.3.3"
+  checksum: f77ef15299537e4796bae6799fbac2c57fc525377caf558b4821fbc69cd66fa73bfbf32d92baa1275901b5e7e601061e8720d112a7148fa8eab991a0bcd31615
+  languageName: node
+  linkType: hard
 
 "run-async@npm:^2.2.0":
   version: 2.4.1

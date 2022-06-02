@@ -66,7 +66,7 @@ const command = {
 
       // Build promise with retries
       let p = insertUsers(users).then(() => {
-        console.log(`Inserted batch ${i + 1} out of ${batchCount}`)
+        console.log(`...inserted batch ${i + 1} out of ${batchCount}`)
       })
 
       for (let k = 0; k < RETRY_COUNT; k++) {
@@ -78,7 +78,7 @@ const command = {
         console.error('Insertion failed all retries: ', e)
       })
 
-      console.log(`Inserting batch ${i + 1} out of ${batchCount}`)
+      console.log(`Inserting batch ${i + 1} out of ${batchCount}...`)
       await p
     }
 

@@ -21,10 +21,7 @@
         ref="commentButton"
         class="absolute-pos"
       >
-        <div
-          class="d-flex"
-          :style="`height: 48px; width: ${$vuetify.breakpoint.xs ? '90vw' : '320px'}`"
-        >
+        <div class="d-flex">
           <v-btn
             v-tooltip="!expand ? 'Add a comment (ctrl + shift + c)' : 'Cancel'"
             small
@@ -43,21 +40,14 @@
               style="width: 100%; top: -10px; position: relative"
               class=""
             >
-              <div class="d-flex">
-                <v-textarea
-                  v-if="$loggedIn() && canComment"
-                  v-model="commentText"
-                  :disabled="loading"
-                  solo
-                  hide-details
-                  autofocus
-                  auto-grow
-                  rows="1"
-                  placeholder="Your comment..."
-                  class="mouse rounded-xl caption elevation-15"
-                  append-icon="mdi-send"
-                  @keydown.enter.exact.prevent="addComment()"
-                ></v-textarea>
+              <div class="d-flex mouse">
+                <smart-text-editor
+                  :multi-line="false"
+                  style="max-width: 500px; max-height: 80%"
+                  class="elevation-5"
+                  max-height="300px"
+                />
+
                 <v-btn
                   v-if="$loggedIn() && canComment"
                   v-tooltip="'Send comment (press enter)'"
@@ -65,8 +55,7 @@
                   icon
                   dark
                   large
-                  class="mouse elevation-0 primary pa-0 ma-o"
-                  style="left: -47px; top: 1px; height: 48px; width: 48px"
+                  class="mouse elevation-5 primary pa-0 ma-o ml-2"
                   @click="addComment()"
                 >
                   <v-icon dark small>mdi-send</v-icon>
@@ -125,21 +114,14 @@
           <div
             v-if="$loggedIn() && canComment"
             class="d-flex justify-center"
-            style="position: relative; left: 24px"
+            style="position: relative"
           >
-            <v-textarea
-              v-model="commentText"
-              solo
-              :disabled="loading"
-              hide-details
-              autofocus
-              auto-grow
-              rows="1"
-              placeholder="Your comment..."
-              class="mouse rounded-xl caption elevation-15"
-              append-icon="mdi-send"
-              @keydown.enter.exact.prevent="addComment()"
-            ></v-textarea>
+            <smart-text-editor
+              :multi-line="false"
+              style="max-width: 80%; width: 100%"
+              class="elevation-5"
+              max-height="60vh"
+            />
             <v-btn
               v-tooltip="'Send comment (press enter)'"
               :disabled="loading"
@@ -147,7 +129,7 @@
               dark
               large
               class="mouse elevation-0 primary pa-0 ma-o"
-              style="left: -47px; top: 1px; height: 48px; width: 48px"
+              style="left: 10px"
               @click="addComment()"
             >
               <v-icon dark small>mdi-send</v-icon>
@@ -206,7 +188,9 @@ import gql from 'graphql-tag'
 import debounce from 'lodash/debounce'
 
 import { getCamArray } from './viewerFrontendHelpers'
+import SmartTextEditor from '../common/text-editor/SmartTextEditor.vue'
 export default {
+  components: { SmartTextEditor },
   apollo: {
     user: {
       query: gql`
