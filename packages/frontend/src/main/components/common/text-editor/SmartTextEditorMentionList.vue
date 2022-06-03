@@ -1,24 +1,36 @@
 <template>
-  <v-card class="items mention-list">
-    <v-card-text>
-      <template v-if="items.length">
-        <button
-          v-for="(item, index) in items"
-          :key="index"
-          class="item"
-          :class="{ 'is-selected': index === selectedIndex }"
-          @click="selectItem(index)"
-        >
-          {{ item }}
-        </button>
-      </template>
-      <div v-else class="item">No result</div>
-    </v-card-text>
-  </v-card>
+  <v-theme-provider :dark="isDarkTheme" :light="!isDarkTheme">
+    <v-card class="mention-list">
+      <v-card-text class="pa-0 px-2">
+        <v-list dense>
+          <template v-if="items.length">
+            <v-list-item-group v-model="selectedIndex">
+              <v-list-item
+                v-for="(item, index) in items"
+                :key="index"
+                class="mention-list__item"
+                @click="selectItem(index)"
+              >
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{ item }}
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-item-group>
+          </template>
+          <v-list-item v-else class="mention-list__empty">No result</v-list-item>
+        </v-list>
+      </v-card-text>
+    </v-card>
+  </v-theme-provider>
 </template>
 
 <script>
-// TODO: Get vuetify theme etc., this is a separate Vue app
+import { isDarkTheme } from '@/main/utils/themeStateManager'
+
+// TODO: Contrast with BG is terrible, needs a new BG color
+
 export default {
   name: 'SmartTextEditorMentionList',
   props: {
@@ -34,6 +46,11 @@ export default {
   data() {
     return {
       selectedIndex: 0
+    }
+  },
+  computed: {
+    isDarkTheme() {
+      return isDarkTheme()
     }
   },
   watch: {
@@ -80,29 +97,5 @@ export default {
 <style scoped lang="scss">
 .mention-list {
   z-index: 10000; // same as tooltips
-}
-
-.items {
-  padding: 0.2rem;
-  position: relative;
-  border-radius: 0.5rem;
-  background: #fff;
-  color: rgba(0, 0, 0, 0.8);
-  overflow: hidden;
-  font-size: 0.9rem;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0px 10px 20px rgba(0, 0, 0, 0.1);
-}
-.item {
-  display: block;
-  margin: 0;
-  width: 100%;
-  text-align: left;
-  background: transparent;
-  border-radius: 0.4rem;
-  border: 1px solid transparent;
-  padding: 0.2rem 0.4rem;
-  &.is-selected {
-    border-color: #000;
-  }
 }
 </style>

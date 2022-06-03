@@ -187,6 +187,8 @@ import * as THREE from 'three'
 import gql from 'graphql-tag'
 import debounce from 'lodash/debounce'
 
+// TODO: Keep same state between mobile & desktop inputs
+
 import { getCamArray } from './viewerFrontendHelpers'
 import SmartTextEditor from '../common/text-editor/SmartTextEditor.vue'
 export default {

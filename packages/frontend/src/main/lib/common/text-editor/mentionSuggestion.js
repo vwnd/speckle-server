@@ -1,6 +1,7 @@
 import { VueRenderer } from '@tiptap/vue-2'
 import SmartTextEditorMentionList from '@/main/components/common/text-editor/SmartTextEditorMentionList.vue'
 import Popper from 'popper.js'
+import vuetify from '@/plugins/vuetify'
 
 /**
  * @type {import('@tiptap/suggestion').SuggestionOptions}
@@ -60,9 +61,10 @@ export const suggestion = {
         // Render mention list with popper.js (which we have because of v-tooltip)
         component = new VueRenderer(SmartTextEditorMentionList, {
           parent: this,
-          propsData: props
+          propsData: props,
+          vuetify
         })
-        document.getElementsByTagName('body')[0].append(component.element)
+        document.getElementsByClassName('v-application')[0].append(component.element)
 
         if (!props.clientRect) {
           return
@@ -74,7 +76,6 @@ export const suggestion = {
         )
 
         // Init click handler for hiding when clicking outside of the popper
-        // TODO: Add dep?
         /** @param {MouseEvent} e */
         clickHandler = (e) => {
           /** @type {Element} */
