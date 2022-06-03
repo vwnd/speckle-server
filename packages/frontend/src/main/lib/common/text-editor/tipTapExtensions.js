@@ -9,6 +9,7 @@ import Link from '@tiptap/extension-link'
 import HardBreak from '@tiptap/extension-hard-break'
 import Mention from '@tiptap/extension-mention'
 import History from '@tiptap/extension-history'
+import Placeholder from '@tiptap/extension-placeholder'
 
 import { Node, Extension } from '@tiptap/core'
 import { TextSelection } from 'prosemirror-state'
@@ -134,8 +135,10 @@ export const UtilitiesExtension = Extension.create({
 
 /**
  * Get TipTap editor extensions that should be loaded in the editor
+ * @param {import('@/main/lib/common/text-editor/documentHelper').SmartTextEditorSchemaOptions}
+ * @param {import('@/main/lib/common/text-editor/documentHelper').SmartTextEditorOptions}
  */
-export function getEditorExtensions({ multiLine = true }) {
+export function getEditorExtensions({ multiLine = true } = {}, { placeholder } = {}) {
   return [
     ...(multiLine ? [Document, HardBreak] : [InlineDoc]),
     UtilitiesExtension,
@@ -156,6 +159,7 @@ export function getEditorExtensions({ multiLine = true }) {
     Mention.configure({
       suggestion
     }),
-    History
+    History,
+    ...(placeholder ? [Placeholder.configure({ placeholder })] : [])
   ]
 }

@@ -64,7 +64,7 @@ export default {
       }
     },
     dialogTitle() {
-      if (this.value?.title || this.value?.url) return 'Edit Link'
+      if (this.value?.url) return 'Edit Link'
       return 'Add Link'
     }
   },

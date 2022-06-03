@@ -42,12 +42,15 @@
             >
               <div class="d-flex mouse">
                 <smart-text-editor
-                  :multi-line="false"
+                  v-model="commentText"
                   style="max-width: 500px; max-height: 80%"
                   class="elevation-5"
                   max-height="300px"
+                  autofocus
+                  placeholder="Your comment..."
+                  :schema-options="editorSchemaOptions"
+                  :disabled="loading"
                 />
-
                 <v-btn
                   v-if="$loggedIn() && canComment"
                   v-tooltip="'Send comment (press enter)'"
@@ -117,10 +120,14 @@
             style="position: relative"
           >
             <smart-text-editor
-              :multi-line="false"
+              v-model="commentText"
               style="max-width: 80%; width: 100%"
               class="elevation-5"
               max-height="60vh"
+              placeholder="Your comment..."
+              autofocus
+              :schema-options="editorSchemaOptions"
+              :disabled="loading"
             />
             <v-btn
               v-tooltip="'Send comment (press enter)'"
@@ -186,11 +193,17 @@
 import * as THREE from 'three'
 import gql from 'graphql-tag'
 import debounce from 'lodash/debounce'
+import { getCamArray } from './viewerFrontendHelpers'
+import SmartTextEditor from '@/main/components/common/text-editor/SmartTextEditor.vue'
+import {
+  basicStringToDocument,
+  isDocEmpty
+} from '@/main/lib/common/text-editor/documentHelper'
 
 // TODO: Keep same state between mobile & desktop inputs
+// TODO: Add to replies as well
+// TODO: Wtf is that expand shit?
 
-import { getCamArray } from './viewerFrontendHelpers'
-import SmartTextEditor from '../common/text-editor/SmartTextEditor.vue'
 export default {
   components: { SmartTextEditor },
   apollo: {
@@ -223,12 +236,16 @@ export default {
     }
   },
   data() {
+    const editorSchemaOptions = {
+      multiLine: true
+    }
     return {
       location: null,
       expand: false,
       visible: true,
       loading: false,
-      commentText: null
+      commentText: null,
+      editorSchemaOptions
     }
   },
   computed: {
@@ -242,7 +259,6 @@ export default {
       'update',
       this.updateCommentBubble
     )
-    // this.$refs.commentTextArea.calculateInputHeight()
     document.addEventListener(
       'keyup',
       function (e) {
@@ -253,12 +269,12 @@ export default {
   },
   methods: {
     async addCommentDirect(emoji) {
-      this.commentText = emoji
+      this.commentText = basicStringToDocument(emoji, this.editorSchemaOptions)
       await this.addComment()
     },
     async addComment() {
       if (this.loading) return
-      if (!this.commentText || this.commentText.length < 1) {
+      if (isDocEmpty(this.commentText)) {
         this.$eventHub.$emit('notification', {
           text: `Comment cannot be empty.`
         })
@@ -276,7 +292,7 @@ export default {
             resourceId: this.$route.params.resourceId
           }
         ],
-        text: this.commentText,
+        text: JSON.stringify(this.commentText),
         data: {
           location: this.location
             ? this.location

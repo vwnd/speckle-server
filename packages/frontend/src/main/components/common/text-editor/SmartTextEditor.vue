@@ -30,10 +30,7 @@ import {
 import { getEditorExtensions } from '@/main/lib/common/text-editor/tipTapExtensions'
 import SmartTextEditorLinkDialog from '@/main/components/common/text-editor/SmartTextEditorLinkDialog.vue'
 
-/**
- * TODO:
- * - Actual user tagging
- */
+// TODO: Style mentions in editor
 
 export default {
   name: 'SmartTextEditor',
@@ -51,11 +48,13 @@ export default {
       default: undefined
     },
     /**
-     * Whether to allow multi-line & multi-paragraph text
+     * Control the document schema
+     * @type {import('@/main/lib/common/text-editor/documentHelper').SmartTextEditorSchemaOptions}
      */
-    multiLine: {
-      type: Boolean,
-      default: true
+    schemaOptions: {
+      type: Object,
+      required: false,
+      default: () => ({})
     },
     /**
      * If set, will limit height and show a scrollbar
@@ -63,6 +62,18 @@ export default {
     maxHeight: {
       type: String,
       default: null
+    },
+    autofocus: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    placeholder: {
+      type: String,
+      default: undefined
     }
   },
   data: () => ({
@@ -114,13 +125,21 @@ export default {
       if (isSame) return
 
       this.editor.commands.setContent(newVal, false)
+    },
+    disabled(newVal) {
+      this.editor.setEditable(newVal)
     }
   },
   mounted() {
     this.editor = new Editor({
-      content: this.value || '',
-      extensions: getEditorExtensions({ multiLine: this.multiLine }),
+      content: this.value || undefined,
+      autofocus: this.autofocus,
+      editable: !this.disabled,
+      extensions: getEditorExtensions(this.schemaOptions || {}, {
+        placeholder: this.placeholder
+      }),
       onUpdate: () => {
+        // TODO: Remove console.log
         console.log(this.getData())
         this.$emit('input', this.getData())
       }
@@ -169,5 +188,19 @@ export default {
 
 .ProseMirror p:last-of-type {
   margin-bottom: 0px;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  pointer-events: none;
+  height: 0;
+}
+
+.theme--dark .ProseMirror p.is-editor-empty:first-child::before {
+  color: #757575; // gray darken-1
+}
+.theme--light .ProseMirror p.is-editor-empty:first-child::before {
+  color: #9e9e9e; // gray
 }
 </style>

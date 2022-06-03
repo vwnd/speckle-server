@@ -105,6 +105,8 @@
 import gql from 'graphql-tag'
 import linkifyUrls from 'linkify-urls'
 
+// TODO: Get rid of custom link rendering, or convert it to doc at least
+
 export default {
   components: {
     UserAvatar: () => import('@/main/components/common/UserAvatar')

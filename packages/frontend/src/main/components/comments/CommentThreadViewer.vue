@@ -1,10 +1,10 @@
 <template>
   <div
-    class="no-mouse py-2 pl-2"
+    class="no-mouse py-2"
     :style="`${
       $vuetify.breakpoint.xs
         ? 'width: 90vw; padding-right:30px;'
-        : 'padding-right:30px; width: 330px;'
+        : 'padding-right:30px;'
     } ${hovered ? 'opacity: 1;' : 'opacity: 1;'} transition: opacity 0.2s ease;`"
     @mouseenter="hovered = true"
     @mouseleave="hovered = false"
@@ -71,21 +71,28 @@
             {{ typingStatusText }}
           </div>
         </v-slide-y-transition>
-        <div v-if="canReply">
-          <v-textarea
+        <div v-if="canReply" class="d-flex">
+          <smart-text-editor
             v-model="replyText"
+            placeholder="Reply..."
+            max-height="300px"
+            autofocus
+            :schema-options="editorSchemaOptions"
             :disabled="loadingReply"
-            solo
-            hide-details
-            auto-grow
-            rows="1"
-            placeholder="Reply (press enter to send)"
-            class="rounded-xl mb-2 caption"
-            append-icon="mdi-send"
+            class="mb-2 elevation-5"
             @input="debTypingUpdate"
-            @click:append="addReply"
-            @keydown.enter.exact.prevent="addReply()"
-          ></v-textarea>
+          />
+          <v-btn
+            v-tooltip="'Send comment (press enter)'"
+            :disabled="loadingReply"
+            icon
+            dark
+            large
+            class="mouse elevation-5 primary ml-2"
+            @click="addReply()"
+          >
+            <v-icon dark small>mdi-send</v-icon>
+          </v-btn>
         </div>
         <div v-else class="caption background rounded-xl py-2 px-4 elevation-2">
           You do not have sufficient permissions to reply to comments in this stream.
@@ -159,10 +166,13 @@
 <script>
 import gql from 'graphql-tag'
 import debounce from 'lodash/debounce'
+import SmartTextEditor from '@/main/components/common/text-editor/SmartTextEditor.vue'
+import CommentThreadReply from '@/main/components/comments/CommentThreadReply.vue'
 
 export default {
   components: {
-    CommentThreadReply: () => import('@/main/components/comments/CommentThreadReply')
+    CommentThreadReply,
+    SmartTextEditor
   },
   props: {
     comment: { type: Object, default: () => null }
@@ -295,7 +305,10 @@ export default {
       showArchiveDialog: false,
       loadingReply: false,
       whoIsTyping: [],
-      isTyping: true
+      isTyping: true,
+      editorSchemaOptions: {
+        multiLine: true
+      }
     }
   },
   computed: {

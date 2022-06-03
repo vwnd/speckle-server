@@ -4,11 +4,6 @@
       <div class="font-weight-bold">Feed</div>
     </portal>
     <v-row>
-      <v-col cols="12">
-        <smart-text-editor :multi-line="false" />
-      </v-col>
-    </v-row>
-    <v-row>
       <v-col cols="12" lg="12">
         <feed-timeline />
       </v-col>
@@ -21,14 +16,12 @@ import {
   STANDARD_PORTAL_KEYS,
   buildPortalStateMixin
 } from '@/main/utils/portalStateManager'
-import SmartTextEditor from '@/main/components/common/text-editor/SmartTextEditor.vue'
 
 export default {
   name: 'TheFeed',
   components: {
     FeedTimeline: () => import('@/main/components/feed/FeedTimeline.vue'),
-    LatestBlogposts: () => import('@/main/components/feed/LatestBlogposts'),
-    SmartTextEditor
+    LatestBlogposts: () => import('@/main/components/feed/LatestBlogposts')
   },
   mixins: [buildPortalStateMixin([STANDARD_PORTAL_KEYS.Toolbar], 'feed', 0)]
 }
