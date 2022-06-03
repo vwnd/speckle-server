@@ -19,7 +19,7 @@
       <div
         v-show="visible && !$store.state.selectedComment"
         ref="commentButton"
-        class="absolute-pos"
+        class="new-comment-overlay absolute-pos"
       >
         <div class="d-flex">
           <v-btn
@@ -50,6 +50,7 @@
                   placeholder="Your comment..."
                   :schema-options="editorSchemaOptions"
                   :disabled="loading"
+                  min-width
                 />
                 <v-btn
                   v-if="$loggedIn() && canComment"
@@ -128,6 +129,7 @@
               autofocus
               :schema-options="editorSchemaOptions"
               :disabled="loading"
+              min-width
             />
             <v-btn
               v-tooltip="'Send comment (press enter)'"
@@ -192,7 +194,7 @@
 <script>
 import * as THREE from 'three'
 import gql from 'graphql-tag'
-import debounce from 'lodash/debounce'
+import { debounce, throttle } from 'lodash'
 import { getCamArray } from './viewerFrontendHelpers'
 import SmartTextEditor from '@/main/components/common/text-editor/SmartTextEditor.vue'
 import {
@@ -255,17 +257,19 @@ export default {
   },
   mounted() {
     window.__viewer.on('select', debounce(this.handleSelect, 10))
+
+    // Throttling update, cause it happens way too often and triggers expensive DOM updates
+    // Smoothing out the animation with CSS transitions (check style)
     window.__viewer.cameraHandler.controls.addEventListener(
       'update',
-      this.updateCommentBubble
+      throttle(() => {
+        this.updateCommentBubble()
+      }, 100)
     )
-    document.addEventListener(
-      'keyup',
-      function (e) {
-        // console.log(e)
-        if (e.shiftKey && e.ctrlKey && e.keyCode === 67) this.toggleExpand()
-      }.bind(this)
-    )
+
+    document.addEventListener('keyup', (e) => {
+      if (e.shiftKey && e.ctrlKey && e.keyCode === 67) this.toggleExpand()
+    })
   },
   methods: {
     async addCommentDirect(emoji) {
@@ -415,7 +419,7 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style scoped lang="scss">
 ::v-deep .v-dialog {
   box-shadow: none;
   overflow-y: hidden;
@@ -437,5 +441,11 @@ export default {
 
 .transition {
   transition: all 0.2s ease;
+}
+
+.new-comment-overlay {
+  $timing: 0.1s;
+  transition: left $timing linear, right $timing linear, top $timing linear,
+    bottom $timing linear;
 }
 </style>

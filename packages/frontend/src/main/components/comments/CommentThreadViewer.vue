@@ -80,6 +80,7 @@
             :schema-options="editorSchemaOptions"
             :disabled="loadingReply"
             class="mb-2 elevation-5"
+            style="max-width: 80%; width: 100%"
             @input="debTypingUpdate"
           />
           <v-btn
@@ -168,6 +169,8 @@ import gql from 'graphql-tag'
 import debounce from 'lodash/debounce'
 import SmartTextEditor from '@/main/components/common/text-editor/SmartTextEditor.vue'
 import CommentThreadReply from '@/main/components/comments/CommentThreadReply.vue'
+
+// TODO: Check out way too wide reply box opening up (this whole thing needs restyling)
 
 export default {
   components: {

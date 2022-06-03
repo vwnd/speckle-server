@@ -4,6 +4,7 @@
       <smart-text-editor-toolbar
         :formats.sync="formatsValue"
         :link="linkValue"
+        :style="{ minWidth: minWidth ? '250px' : undefined }"
         @link="onLinkClick"
         @unlink="onUnlinkClick"
       />
@@ -62,6 +63,13 @@ export default {
     maxHeight: {
       type: String,
       default: null
+    },
+    /**
+     * If true, will limit max width so that the toolbar can render in full
+     */
+    minWidth: {
+      type: Boolean,
+      default: false
     },
     autofocus: {
       type: Boolean,

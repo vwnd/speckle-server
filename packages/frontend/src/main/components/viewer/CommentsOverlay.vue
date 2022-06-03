@@ -28,12 +28,11 @@
       <div
         v-for="comment in activeComments"
         v-show="isVisible(comment)"
+        :id="`bubble-${comment.id}`"
         :key="comment.id"
         :ref="`comment-${comment.id}`"
-        :class="`absolute-pos rounded-xl no-mouse `"
-        :style="`transition: opacity 0.2s ease; z-index:${
-          comment.expanded ? '20' : '10'
-        }; ${
+        :class="`comment-bubble absolute-pos rounded-xl no-mouse `"
+        :style="`z-index:${comment.expanded ? '20' : '10'}; ${
           hasExpandedComment &&
           !comment.expanded &&
           !comment.hovered &&
@@ -105,9 +104,10 @@
       <div
         v-for="comment in activeComments"
         v-show="isVisible(comment)"
+        :id="`thread-${comment.id}`"
         :key="comment.id + '-card'"
         :ref="`commentcard-${comment.id}`"
-        :class="`hover-bg absolute-pos rounded-xl overflow-y-auto ${
+        :class="`comment-thread hover-bg absolute-pos rounded-xl overflow-y-auto ${
           comment.hovered && false ? 'background elevation-5' : ''
         }`"
         :style="`z-index:${comment.expanded ? '20' : '10'};`"
@@ -169,7 +169,7 @@
 </template>
 <script>
 import * as THREE from 'three'
-import debounce from 'lodash/debounce'
+import { debounce, throttle } from 'lodash'
 import gql from 'graphql-tag'
 
 export default {
@@ -340,23 +340,27 @@ export default {
     }
     window.__viewer.on(
       'select',
-      debounce(
-        function () {
-          // prevents comment collapse if filters are reset (that triggers a deselect event from the viewer)
-          if (this.$store.state.preventCommentCollapse) {
-            this.$store.commit('setPreventCommentCollapse', { value: false })
-            return
-          }
-          for (const c of this.localComments) {
-            this.collapseComment(c)
-          }
-        }.bind(this),
-        10
-      )
+      debounce(() => {
+        // prevents comment collapse if filters are reset (that triggers a deselect event from the viewer)
+        if (this.$store.state.preventCommentCollapse) {
+          this.$store.commit('setPreventCommentCollapse', { value: false })
+          return
+        }
+        for (const c of this.localComments) {
+          this.collapseComment(c)
+        }
+      }, 10)
     )
-    window.__viewer.cameraHandler.controls.addEventListener('update', () =>
-      this.updateCommentBubbles()
+
+    // Throttling update, cause it happens way too often and triggers expensive DOM updates
+    // Smoothing out the animation with CSS transitions (check style)
+    window.__viewer.cameraHandler.controls.addEventListener(
+      'update',
+      throttle(() => {
+        this.updateCommentBubbles()
+      }, 100)
     )
+
     setTimeout(() => {
       this.updateCommentBubbles()
     }, 1000)
@@ -564,7 +568,7 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style scoped lang="scss">
 >>> .emoji-btn {
   background-color: initial !important;
 }
@@ -602,5 +606,12 @@ export default {
 }
 .mouse {
   pointer-events: auto;
+}
+
+.comment-bubble,
+.comment-thread {
+  $timing: 0.1s;
+  transition: left $timing linear, right $timing linear, top $timing linear,
+    bottom $timing linear, opacity 0.2s ease;
 }
 </style>
