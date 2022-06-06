@@ -1,0 +1,1 @@
+export const VIEWER_UPDATE_THROTTLE_TIME = 100

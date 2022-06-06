@@ -201,13 +201,14 @@ import {
   basicStringToDocument,
   isDocEmpty
 } from '@/main/lib/common/text-editor/documentHelper'
-
-// TODO: Keep same state between mobile & desktop inputs
-// TODO: Add to replies as well
-// TODO: Wtf is that expand shit?
+import { VIEWER_UPDATE_THROTTLE_TIME } from '@/main/lib/viewer/comments/commentsHelper'
+import { buildResizeHandlerMixin } from '@/main/lib/common/web-apis/mixins/windowResizeHandler'
 
 export default {
   components: { SmartTextEditor },
+  mixins: [
+    buildResizeHandlerMixin({ shouldThrottle: true, wait: VIEWER_UPDATE_THROTTLE_TIME })
+  ],
   apollo: {
     user: {
       query: gql`
@@ -256,22 +257,36 @@ export default {
     }
   },
   mounted() {
-    window.__viewer.on('select', debounce(this.handleSelect, 10))
+    this.viewerSelectHandler = debounce(this.handleSelect, 10)
+    window.__viewer.on('select', this.viewerSelectHandler)
 
     // Throttling update, cause it happens way too often and triggers expensive DOM updates
     // Smoothing out the animation with CSS transitions (check style)
+    this.viewerControlsUpdateHandler = throttle(() => {
+      this.updateCommentBubble()
+    }, VIEWER_UPDATE_THROTTLE_TIME)
     window.__viewer.cameraHandler.controls.addEventListener(
       'update',
-      throttle(() => {
-        this.updateCommentBubble()
-      }, 100)
+      this.viewerControlsUpdateHandler
     )
 
-    document.addEventListener('keyup', (e) => {
+    this.docKeyUpHandler = (e) => {
       if (e.shiftKey && e.ctrlKey && e.keyCode === 67) this.toggleExpand()
-    })
+    }
+    document.addEventListener('keyup', this.docKeyUpHandler)
+  },
+  beforeDestroy() {
+    window.__viewer.removeListener('select', this.viewerSelectHandler)
+    window.__viewer.cameraHandler.controls.removeEventListener(
+      'update',
+      this.viewerControlsUpdateHandler
+    )
+    document.removeEventListener('keyup', this.docKeyUpHandler)
   },
   methods: {
+    onWindowResize() {
+      this.updateCommentBubble()
+    },
     async addCommentDirect(emoji) {
       this.commentText = basicStringToDocument(emoji, this.editorSchemaOptions)
       await this.addComment()

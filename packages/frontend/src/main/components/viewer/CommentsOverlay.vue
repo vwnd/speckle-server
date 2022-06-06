@@ -24,26 +24,33 @@
       "
       class="no-mouse"
     >
-      <!-- Comment bubbles -->
       <div
         v-for="comment in activeComments"
         v-show="isVisible(comment)"
         :id="`bubble-${comment.id}`"
         :key="comment.id"
         :ref="`comment-${comment.id}`"
-        :class="`comment-bubble absolute-pos rounded-xl no-mouse `"
-        :style="`z-index:${comment.expanded ? '20' : '10'}; ${
-          hasExpandedComment &&
-          !comment.expanded &&
-          !comment.hovered &&
-          !comment.bouncing
-            ? 'opacity: 0.1;'
-            : 'opacity: 1;'
-        }`"
+        :class="`comment-bubble-wrapper absolute-pos no-mouse d-flex`"
+        :style="{
+          zIndex: comment.expanded ? 20 : 10
+        }"
         @mouseenter="comment.hovered = true"
         @mouseleave="comment.hovered = false"
       >
-        <div class="" style="pointer-events: none">
+        <!-- Comment bubble -->
+        <div
+          class="comment-bubble rounded-xl"
+          :style="{
+            pointerEvents: 'none',
+            opacity:
+              hasExpandedComment &&
+              !comment.expanded &&
+              !comment.hovered &&
+              !comment.bouncing
+                ? 0.1
+                : 1
+          }"
+        >
           <div class="d-flex align-center" style="pointer-events: none">
             <v-btn
               v-show="!($vuetify.breakpoint.xs && comment.expanded)"
@@ -99,35 +106,26 @@
             </v-slide-x-transition>
           </div>
         </div>
-      </div>
-      <!-- Comment Threads -->
-      <div
-        v-for="comment in activeComments"
-        v-show="isVisible(comment)"
-        :id="`thread-${comment.id}`"
-        :key="comment.id + '-card'"
-        :ref="`commentcard-${comment.id}`"
-        :class="`comment-thread hover-bg absolute-pos rounded-xl overflow-y-auto ${
-          comment.hovered && false ? 'background elevation-5' : ''
-        }`"
-        :style="`z-index:${comment.expanded ? '20' : '10'};`"
-        @mouseenter="comment.hovered = true"
-        @mouseleave="comment.hovered = false"
-      >
-        <!-- <v-card class="elevation-0 ma-0 transparent" style="height: 100%"> -->
-        <v-fade-transition>
-          <div v-show="comment.expanded">
-            <comment-thread-viewer
-              :comment="comment"
-              @bounce="bounceComment"
-              @refresh-layout="updateCommentBubbles()"
-              @close="collapseComment"
-              @deleted="handleDeletion"
-              @add-resources="(e) => $emit('add-resources', e)"
-            />
-          </div>
-        </v-fade-transition>
-        <!-- </v-card> -->
+        <!-- Comment thread -->
+        <div
+          :id="`comment-thread-${comment.id}`"
+          :class="`comment-thread `"
+          @mouseenter="comment.hovered = true"
+          @mouseleave="comment.hovered = false"
+        >
+          <v-fade-transition>
+            <div v-show="comment.expanded">
+              <comment-thread-viewer
+                :comment="comment"
+                @bounce="bounceComment"
+                @refresh-layout="updateCommentBubbles()"
+                @close="collapseComment"
+                @deleted="handleDeletion"
+                @add-resources="(e) => $emit('add-resources', e)"
+              />
+            </div>
+          </v-fade-transition>
+        </div>
       </div>
     </div>
     <portal v-if="activeComments.length !== 0" to="comments">
@@ -171,6 +169,8 @@
 import * as THREE from 'three'
 import { debounce, throttle } from 'lodash'
 import gql from 'graphql-tag'
+import { VIEWER_UPDATE_THROTTLE_TIME } from '@/main/lib/viewer/comments/commentsHelper'
+import { buildResizeHandlerMixin } from '@/main/lib/common/web-apis/mixins/windowResizeHandler'
 
 export default {
   components: {
@@ -178,6 +178,9 @@ export default {
     CommentsViewerNavbar: () =>
       import('@/main/components/comments/CommentsViewerNavbar')
   },
+  mixins: [
+    buildResizeHandlerMixin({ shouldThrottle: true, wait: VIEWER_UPDATE_THROTTLE_TIME })
+  ],
   apollo: {
     comments: {
       query: gql`
@@ -338,34 +341,44 @@ export default {
         window.clearInterval(this.commentIntervalChecker)
       }, 2000)
     }
-    window.__viewer.on(
-      'select',
-      debounce(() => {
-        // prevents comment collapse if filters are reset (that triggers a deselect event from the viewer)
-        if (this.$store.state.preventCommentCollapse) {
-          this.$store.commit('setPreventCommentCollapse', { value: false })
-          return
-        }
-        for (const c of this.localComments) {
-          this.collapseComment(c)
-        }
-      }, 10)
-    )
+
+    this.viewerSelectHandler = debounce(() => {
+      // prevents comment collapse if filters are reset (that triggers a deselect event from the viewer)
+      if (this.$store.state.preventCommentCollapse) {
+        this.$store.commit('setPreventCommentCollapse', { value: false })
+        return
+      }
+      for (const c of this.localComments) {
+        this.collapseComment(c)
+      }
+    }, 10)
+    window.__viewer.on('select', this.viewerSelectHandler)
 
     // Throttling update, cause it happens way too often and triggers expensive DOM updates
     // Smoothing out the animation with CSS transitions (check style)
+    this.viewerControlsUpdateHandler = throttle(() => {
+      this.updateCommentBubbles()
+    }, VIEWER_UPDATE_THROTTLE_TIME)
     window.__viewer.cameraHandler.controls.addEventListener(
       'update',
-      throttle(() => {
-        this.updateCommentBubbles()
-      }, 100)
+      this.viewerControlsUpdateHandler
     )
 
     setTimeout(() => {
       this.updateCommentBubbles()
     }, 1000)
   },
+  beforeDestroy() {
+    window.__viewer.removeListener('select', this.viewerSelectHandler)
+    window.__viewer.cameraHandler.controls.removeEventListener(
+      'update',
+      this.viewerControlsUpdateHandler
+    )
+  },
   methods: {
+    onWindowResize() {
+      this.updateCommentBubbles()
+    },
     isUnread(comment) {
       return new Date(comment.updatedAt) - new Date(comment.viewedAt) > 0
     },
@@ -463,7 +476,6 @@ export default {
       for (const comment of this.localComments) {
         // get html elements
         const commentEl = this.$refs[`comment-${comment.id}`][0]
-        const card = this.$refs[`commentcard-${comment.id}`][0]
 
         if (!commentEl) continue
 
@@ -519,39 +531,6 @@ export default {
 
         commentEl.style.top = `${tY}px`
         commentEl.style.left = `${tX}px`
-
-        const maxHeight = this.$refs.parent.clientHeight - paddingYTop - paddingYBottom
-
-        card.style.maxHeight = `${maxHeight}px`
-
-        if (tX > this.$refs.parent.clientWidth - (paddingX + 50 + card.scrollWidth)) {
-          tX = this.$refs.parent.clientWidth - (paddingX + 50 + card.scrollWidth)
-        }
-        card.style.left = `${tX + 40}px`
-        // card.style.right = '0px'
-
-        let cardTop = paddingYTop
-
-        if (card.scrollHeight > maxHeight) {
-          card.style.top = `${cardTop}px`
-        } else {
-          cardTop = tY - card.scrollHeight / 2
-
-          // top clip
-          if (cardTop < paddingYTop) cardTop = paddingYTop
-
-          const cardBottom = cardTop + card.clientHeight
-          const maxBottom = this.$refs.parent.clientHeight - 45
-
-          // bottom clip
-          if (cardBottom > maxBottom) {
-            cardTop -= (cardBottom - maxBottom) / 2
-            cardTop = this.$refs.parent.clientHeight - card.clientHeight - 45
-          }
-
-          if (this.$vuetify.breakpoint.xs) cardTop = paddingYTop
-          card.style.top = `${cardTop}px`
-        }
       }
     },
     bounceComment(id) {
@@ -581,26 +560,9 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 10;
   transform-origin: center;
 }
-.fixed-pos {
-  pointer-events: auto;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 10;
-}
-.no-mouse-parent {
-  pointer-events: none;
-}
-.no-mouse-parent * {
-  pointer-events: auto;
-}
 
-.hover-bg {
-  transition: background 0.3s ease;
-}
 .no-mouse {
   pointer-events: none;
 }
@@ -608,10 +570,29 @@ export default {
   pointer-events: auto;
 }
 
-.comment-bubble,
+.comment-bubble-wrapper,
 .comment-thread {
   $timing: 0.1s;
   transition: left $timing linear, right $timing linear, top $timing linear,
     bottom $timing linear, opacity 0.2s ease;
+}
+
+.comment-thread {
+  $thread-y-margin: 80px;
+  $thread-x-margin: 10px;
+
+  pointer-events: none;
+  transform: none;
+  position: fixed;
+  top: $thread-y-margin;
+  left: $thread-x-margin;
+  right: $thread-x-margin;
+}
+
+@media screen and (min-width: 600px) {
+  .comment-thread {
+    transform: translateY(-50%);
+    position: static;
+  }
 }
 </style>

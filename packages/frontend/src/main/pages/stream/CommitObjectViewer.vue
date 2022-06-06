@@ -226,6 +226,10 @@ import {
   buildPortalStateMixin
 } from '@/main/utils/portalStateManager'
 
+// TODO: Add comment: Re-style with new submit button, maybe get rid of duplicate editor & check why viewer
+// acts differently between small screen view thread/add new comment
+// TODO: Thread: validate what happens when height is too big (on small/big screens)
+
 export default {
   components: {
     SpeckleViewer,

@@ -13,11 +13,13 @@
         :editor="editor"
         :style="maxHeight ? `max-height: ${maxHeight}; overflow-y: auto;` : ''"
       />
+      <div v-if="$slots.actions">
+        <slot name="actions" />
+      </div>
       <smart-text-editor-link-dialog
         v-model="linkDialogData"
         @submit="onLinkDialogSubmit"
       />
-      <div class="editor-mount-point" />
     </v-card-text>
   </v-card>
 </template>
@@ -132,7 +134,7 @@ export default {
       const isSame = JSON.stringify(this.getData()) === JSON.stringify(newVal)
       if (isSame) return
 
-      this.editor.commands.setContent(newVal, false)
+      this.editor.commands.setContent(newVal || '')
     },
     disabled(newVal) {
       this.editor.setEditable(newVal)
@@ -147,9 +149,12 @@ export default {
         placeholder: this.placeholder
       }),
       onUpdate: () => {
+        const data = this.getData()
+        if (!data || Object.keys(data).length < 1) return
+
         // TODO: Remove console.log
-        console.log(this.getData())
-        this.$emit('input', this.getData())
+        console.log(data)
+        this.$emit('input', data)
       }
     })
   },

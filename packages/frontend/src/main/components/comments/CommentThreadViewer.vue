@@ -1,15 +1,6 @@
 <template>
-  <div
-    class="no-mouse py-2"
-    :style="`${
-      $vuetify.breakpoint.xs
-        ? 'width: 90vw; padding-right:30px;'
-        : 'padding-right:30px;'
-    } ${hovered ? 'opacity: 1;' : 'opacity: 1;'} transition: opacity 0.2s ease;`"
-    @mouseenter="hovered = true"
-    @mouseleave="hovered = false"
-  >
-    <div v-if="$vuetify.breakpoint.xs" class="text-right mb-5 mouse">
+  <div class="comment-thread-viewer mouse">
+    <div v-if="$vuetify.breakpoint.xs" class="text-right mb-5">
       <v-btn
         icon
         small
@@ -28,7 +19,7 @@
         <v-icon small>mdi-close</v-icon>
       </v-btn>
     </div>
-    <div v-show="!minimize" style="width: 100%" class="mouse">
+    <div v-show="!minimize" class="mx-2">
       <div
         v-if="!isComplete"
         class="warning rounded-xl py-2 caption mb-2 text-center"
@@ -71,7 +62,7 @@
             {{ typingStatusText }}
           </div>
         </v-slide-y-transition>
-        <div v-if="canReply" class="d-flex">
+        <div v-if="canReply" class="d-flex flex-column relative">
           <smart-text-editor
             v-model="replyText"
             placeholder="Reply..."
@@ -80,20 +71,10 @@
             :schema-options="editorSchemaOptions"
             :disabled="loadingReply"
             class="mb-2 elevation-5"
-            style="max-width: 80%; width: 100%"
+            style="max-width: 500px"
+            min-width
             @input="debTypingUpdate"
-          />
-          <v-btn
-            v-tooltip="'Send comment (press enter)'"
-            :disabled="loadingReply"
-            icon
-            dark
-            large
-            class="mouse elevation-5 primary ml-2"
-            @click="addReply()"
-          >
-            <v-icon dark small>mdi-send</v-icon>
-          </v-btn>
+          ></smart-text-editor>
         </div>
         <div v-else class="caption background rounded-xl py-2 px-4 elevation-2">
           You do not have sufficient permissions to reply to comments in this stream.
@@ -101,30 +82,42 @@
         <div v-show="loadingReply" class="px-2">
           <v-progress-linear indeterminate />
         </div>
-        <div ref="replyinput" class="text-right">
+        <div ref="replyinput" class="d-flex justify-space-between align-center">
           <v-btn
-            v-show="canArchiveThread"
-            v-tooltip="'Marks this thread as archived.'"
-            class="white--text mt-2 mr-2"
-            small
+            v-tooltip="'Send comment (press enter)'"
+            :disabled="loadingReply"
+            class="mouse elevation-5 primary"
             icon
-            depressed
-            color="error"
-            @click="showArchiveDialog = true"
+            dark
+            large
+            @click="addReply()"
           >
-            <v-icon small>mdi-delete-outline</v-icon>
+            <v-icon dark small>mdi-send</v-icon>
           </v-btn>
-          <v-btn
-            v-tooltip="'Share this comment as a link!'"
-            class="white--text mt-2 mr-2 rounded-xl elevation-4"
-            small
-            depressed
-            color="primary"
-            @click="copyCommentLinkToClip()"
-          >
-            <v-icon small class="mr-2">mdi-share-variant</v-icon>
-            share
-          </v-btn>
+          <div>
+            <v-btn
+              v-tooltip="'Share this comment as a link!'"
+              class="rounded-xl elevation-5"
+              small
+              depressed
+              @click="copyCommentLinkToClip()"
+            >
+              <v-icon small class="mr-2">mdi-share-variant</v-icon>
+              Share
+            </v-btn>
+            <v-btn
+              v-show="canArchiveThread"
+              v-tooltip="'Marks this thread as archived.'"
+              class="white--text ml-2"
+              small
+              icon
+              depressed
+              color="error"
+              @click="showArchiveDialog = true"
+            >
+              <v-icon small>mdi-delete-outline</v-icon>
+            </v-btn>
+          </div>
         </div>
         <v-dialog v-model="showArchiveDialog" max-width="500">
           <v-card>
@@ -169,8 +162,10 @@ import gql from 'graphql-tag'
 import debounce from 'lodash/debounce'
 import SmartTextEditor from '@/main/components/common/text-editor/SmartTextEditor.vue'
 import CommentThreadReply from '@/main/components/comments/CommentThreadReply.vue'
+import { isDocEmpty } from '@/main/lib/common/text-editor/documentHelper'
 
 // TODO: Check out way too wide reply box opening up (this whole thing needs restyling)
+// TODO: Fix TextSelection endpoint not pointing into a node with inline content (doc)
 
 export default {
   components: {
@@ -472,7 +467,7 @@ export default {
       return delta > 450000
     },
     async addReply() {
-      if (!this.replyText || this.replyText.length < 1) {
+      if (isDocEmpty(this.replyText)) {
         this.$eventHub.$emit('notification', {
           text: `Cannot post an empty reply.`
         })
@@ -482,7 +477,7 @@ export default {
       const replyInput = {
         streamId: this.$route.params.streamId,
         parentComment: this.comment.id,
-        text: this.replyText
+        text: JSON.stringify(this.replyText)
       }
 
       this.loadingReply = true
