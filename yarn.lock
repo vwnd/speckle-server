@@ -4708,6 +4708,7 @@ __metadata:
     pg: ^8.7.3
     prettier: ^2.5.1
     prom-client: ^14.0.1
+    rhino3dm: ^7.15.0
     undici: ^5.4.0
     valid-filename: ^3.1.0
     web-ifc: ^0.0.35
@@ -19552,6 +19553,13 @@ __metadata:
   version: 1.0.0
   resolution: "rgba-regex@npm:1.0.0"
   checksum: 7f2cd271572700faea50753d82524cb2b98f17a5b9722965c7076f6cd674fe545f28145b7ef2cccabc9eca2475c793db16862cd5e7b3784a9f4b8d6496431057
+  languageName: node
+  linkType: hard
+
+"rhino3dm@npm:^7.15.0":
+  version: 7.15.0
+  resolution: "rhino3dm@npm:7.15.0"
+  checksum: ed243567b5c08fb99dd5460284a3ac2c3d384a95efa57caaaab9dda64b5525d354bac75bed627afb5078de2dfa3e30a390df0fdd88c5d810eef314e10845ed3f
   languageName: node
   linkType: hard
 
